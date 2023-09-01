@@ -86,19 +86,8 @@ class Itemfusion(commands.Cog):
                  ["レリック","シールド"],
                  ["リーライ クリスタル ","セプター"],
                  ["ステラック","の籠手"]]
-
-    @commands.command(aliases=["アイテム合成","アイテムヒュージョン","if"])
-    async def itemfusion(self, ctx):
-                 
-        pick = random.sample(self.words,2)
-
-        kaminoku = pick[0][0]
-        simonoku = pick[1][1]
-
-        if not simonoku.startswith("の"):
-            simonoku = " " + simonoku
-
-        messages = ["LoLに新アイテムが実装！？",
+        
+        self.messages = ["LoLに新アイテムが実装！？",
                     "今メタのアイテムはこれだ！",
                     "OPアイテムすぎるｗ",
                     "アイテム合成してみた！",
@@ -112,7 +101,47 @@ class Itemfusion(commands.Cog):
                     "新ビルド必須アイテム！",
                     "そのキャラはこのアイテム積むといいよ"]
 
-        await ctx.send(random.choice(messages) + "\n# " + kaminoku + simonoku)
+    @commands.command(aliases=["アイテム合成","アイテムヒュージョン","if"])
+    async def itemfusion(self, ctx):
+                 
+        pick = random.sample(self.words,2)
+
+        kaminoku = pick[0][0]
+        simonoku = pick[1][1]
+
+        if not simonoku.startswith("の"):
+            simonoku = " " + simonoku
+
+        await ctx.send(random.choice(self.messages) + "\n# " + kaminoku + simonoku)
+
+    @commands.command(aliases=["超アイテム合成","uif"])
+    async def ultimateitemfusion(self,ctx,nagasa : int = random.randint(3,5)):
+        if nagasa > len(self.words):
+            nagasa = len(self.words)
+        elif nagasa <= 2:
+            await ctx.send("length must 上回る ２")
+            return
+
+        pick = random.sample(self.words,nagasa)
+
+        sendarg = random.choice(self.messages) + "\n# "
+        for i, word in enumerate(pick):
+            if i == 0: #最初の１個は上の句から始まる
+                sendarg += word[0]
+                continue
+            if i+1 > nagasa-1: #最後の１個は下の句で終わるので中断
+                break
+
+            ku = random.randint(0,1) #0:上の句 1:下の句 ランダムで選ぶ
+
+            if len(sendarg)+len(word[ku]) > 2000: #２０００字を超えた場合はそのまま送信
+                await ctx.send(sendarg)
+                return
+            
+            sendarg += word[ku]
+        sendarg += pick[-1][1] #最後の下の句で終わる
+
+        await ctx.send(sendarg)
 
 async def setup(bot):
     await bot.add_cog(Itemfusion(bot))
