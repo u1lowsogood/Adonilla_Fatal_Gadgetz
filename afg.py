@@ -28,5 +28,6 @@ async def on_ready():
     await bot.load_extension('cogs.pinch.pinch')
     await bot.load_extension("cogs.reloader.reloader")
     await bot.load_extension("cogs.satujin.satujin")
+    await bot.load_extension("cogs.itemfusion.itemfusion")
 
 bot.run(TOKEN)
