@@ -2,7 +2,7 @@ from discord.ext import commands
 import random
 import numpy as np
 import cv2
-import puttext
+from ...lib import puttext
 import datetime
 import locale
 
