@@ -30,5 +30,6 @@ async def on_ready():
     await bot.load_extension("cogs.satujin.satujin")
     await bot.load_extension("cogs.itemfusion.itemfusion")
     await bot.load_extension("cogs.niconico_akaji.niconico_akaji")
+    await bot.load_extension("cogs.gabigabikun.gabigabikun")
 
 bot.run(TOKEN)
