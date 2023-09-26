@@ -19,7 +19,7 @@ class MessageRegister(commands.Cog):
         self.update_db()
         msg = "```md\n# 【登録済みキーリストくん】\n\n"
         for index, key in enumerate(self.register_dict.keys()):
-            msg += str(index+1)+". " + key + "\n"
+            msg += str(index+1)+". " + key + " - " + self.register_dict[key][:15].replace("\n","") +"\n"
         msg += "```"
         await ctx.send(msg)
 
@@ -46,11 +46,8 @@ class MessageRegister(commands.Cog):
         self.update_db()
 
         toroku = "上書き" if key in self.register_dict else "登録"
-
-        if len(content) >= 2000:
-            self.register_dict[key] = content[:1999]
-        else:
-            self.register_dict[key] = content
+        
+        self.register_dict[key] = content[:1999]
         
         with open(self.PATH,"w",encoding="UTF-8") as f:
             json.dump(self.register_dict,f,indent=2,ensure_ascii=False)
