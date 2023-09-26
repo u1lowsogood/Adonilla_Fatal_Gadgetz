@@ -19,17 +19,21 @@ class MessageRegister(commands.Cog):
 
         self.update_db()
         keys = list(self.register_dict.keys())
-        msg = "```md\n# 【登録済みキーリストくん】\n/rl [index] で指定ｗ\n\n"
+        msg = "```md\n# 【登録済みキーリストくん】\n/rl [index] でページ指定ｗ\n\n"
         
-        end = page*20+1
-        start = end-20
+        start = (page*20)-20
+        end = start+19
 
-        for index, key in enumerate(keys[start:end],start=start):
+        if start >= len(keys):
+            await ctx.send("ページデカすぎ クソ田舎")
+            return
+
+        for index, key in enumerate(keys[start:end],start=start+1):
             msg += str(index)+". " + key + " - " + self.register_dict[key][:15].replace("\n","") +"\n"
         else:
             end = index
 
-        msg += "\n<Page."+str(page)+" ["+str(start)+"-"+str(end)+"]>"
+        msg += "\n<Page."+str(page)+" ["+str(start+1)+"-"+str(end)+"]>"
         msg += "```"
 
         await ctx.send(msg)
