@@ -7,45 +7,56 @@ class MessageRegister(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.PATH = ".cogs/message_register/register_db.json"
+        self.PATH = "./cogs/message_register/register_db.json"
         self.register_dict : dict = None
 
     def update_db(self):
-        with open(self.PATH) as f:
+        with open(self.PATH,"r",encoding="UTF-8") as f:
             self.register_dict = json.load(f)
 
     @commands.command(aliases=["rl","レジストリスト"])
     async def registlist(self, ctx):
         self.update_db()
-        msg = "```md\n# 【登録済み単語リストくん】\n\n"
-        for index, key in enumerate(self.register_dict.keys):
-            msg += str(index)+"." + key + "\n"
+        msg = "```md\n# 【登録済みキーリストくん】\n\n"
+        for index, key in enumerate(self.register_dict.keys()):
+            msg += str(index+1)+". " + key + "\n"
         msg += "```"
-        ctx.send(msg)
+        await ctx.send(msg)
 
     @commands.command(aliases=["rm","レジストメッセージ"])
     async def registmessage(self, ctx, key:str = None):
 
-        if key == None:
-            await ctx.send("キーが存在しないねえ＾＾\n【例 /rm おまんこ → 次回以降「おまんこ」に反応】")
-            return
         if ctx.message.reference == None:
             await ctx.send("このコマンドは返信\n # と一緒に\n # 利用してみてねｗ←ｗ")
             return
-        
+        if key == None:
+            await ctx.send("キーが存在しないねえ＾＾\n【例 /rm おまんこ → 次回以降「おまんこ」に反応】")
+            return
+
+        targetmsg : discord.Message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+        content = ""
+
+        if targetmsg.attachments == []:
+            content = targetmsg.content
+        else:
+            for attachment in targetmsg.attachments:
+                content += attachment.url + "\n"
+            content += targetmsg.content
+
         self.update_db()
 
-        if ctx.message.attachments == []:
-            self.register_dict[key] = ctx.message.content
-        else:
-            content = ""
-            for i in len(ctx.message.attachments):
-                content += ctx.message.attachments[i].url + "\n"
-            content += ctx.message.content
-            self.register_dict[key] = content[:2000]
+        toroku = "上書き" if key in self.register_dict else "登録"
 
-        with open(self.PATH) as f:
-            json.dump(self.register_dict,f,indent=2)
+        if len(content) >= 2000:
+            self.register_dict[key] = content[:1999]
+        else:
+            self.register_dict[key] = content
+        
+        with open(self.PATH,"w",encoding="UTF-8") as f:
+            json.dump(self.register_dict,f,indent=2,ensure_ascii=False)
+
+        await ctx.send("メッセージ を キー：" + key + " で"+toroku+"しましたｗ")
+        
 
     @commands.Cog.listener()
     async def on_message(self,msg : discord.Message):
@@ -55,10 +66,10 @@ class MessageRegister(commands.Cog):
         
         self.update_db()
 
-        if msg.content not in self.register_dict.keys:
+        if msg.content not in self.register_dict.keys():
             return
         
-        msg.channel.send(self.register_dict[msg.content])
+        await msg.channel.send(self.register_dict[msg.content])
         
         
 

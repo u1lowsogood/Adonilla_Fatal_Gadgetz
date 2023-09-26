@@ -33,5 +33,6 @@ async def on_ready():
     await bot.load_extension("cogs.gabigabikun.gabigabikun")
     await bot.load_extension("cogs.increase_uterus.increase_uterus")
     await bot.load_extension("cogs.amanda.amanda")
+    await bot.load_extension("cogs.message_register.message_register")
 
 bot.run(TOKEN)
