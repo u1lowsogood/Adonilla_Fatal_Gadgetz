@@ -19,7 +19,7 @@ class MessageRegister(commands.Cog):
 
         self.update_db()
         keys = list(self.register_dict.keys())
-        msg = "```md\n# 【登録済みキーリストくん】\n/rl [index] でページ指定ｗ\n\n"
+        msg = "```md\n# 【登録済みキーリストくん】\n/rl [Page] でページ指定ｗ\n\n"
         
         start = (page*20)-20
         end = start+19
