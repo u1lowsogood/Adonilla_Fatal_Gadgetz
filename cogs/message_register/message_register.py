@@ -15,12 +15,23 @@ class MessageRegister(commands.Cog):
             self.register_dict = json.load(f)
 
     @commands.command(aliases=["rl","レジストリスト"])
-    async def registlist(self, ctx):
+    async def registlist(self, ctx,page:int=1):
+
         self.update_db()
-        msg = "```md\n# 【登録済みキーリストくん】\n\n"
-        for index, key in enumerate(self.register_dict.keys()):
-            msg += str(index+1)+". " + key + " - " + self.register_dict[key][:15].replace("\n","") +"\n"
+        keys = list(self.register_dict.keys())
+        msg = "```md\n# 【登録済みキーリストくん】\n/rl [index] で指定ｗ\n\n"
+        
+        end = page*20+1
+        start = end-20
+
+        for index, key in enumerate(keys[start:end],start=start):
+            msg += str(index)+". " + key + " - " + self.register_dict[key][:15].replace("\n","") +"\n"
+        else:
+            end = index
+
+        msg += "\n<Page."+str(page)+" ["+str(start)+"-"+str(end)+"]>"
         msg += "```"
+
         await ctx.send(msg)
 
     @commands.command(aliases=["rm","レジストメッセージ"])
