@@ -14,7 +14,7 @@ class MessageRegister(commands.Cog):
         with open(self.PATH,"r",encoding="UTF-8") as f:
             self.register_dict = json.load(f)
 
-    @commands.command(aliases=["rl","レジストリスト"])
+    @commands.command(aliases=["rl","レジストリスト"],description="登録された単語リストを表示します")
     async def registlist(self, ctx,page:int=1):
 
         self.update_db()
@@ -38,7 +38,7 @@ class MessageRegister(commands.Cog):
 
         await ctx.send(msg)
 
-    @commands.command(aliases=["rm","レジストメッセージ"])
+    @commands.command(aliases=["rm","レジストメッセージ"],description="キーで返信先のメッセージを登録します。\nキー名を喋るとメッセージが表示されるようになります。")
     async def registmessage(self, ctx, key:str = None):
 
         if ctx.message.reference == None:
