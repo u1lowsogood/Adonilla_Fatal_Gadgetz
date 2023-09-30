@@ -8,17 +8,17 @@ class MessageRegister(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.PATH = "./cogs/message_register/register_db.json"
-        self.register_dict : dict = None
+        self.registered_dict : dict = None
 
     def update_db(self):
         with open(self.PATH,"r",encoding="UTF-8") as f:
-            self.register_dict = json.load(f)
+            self.registered_dict = json.load(f)
 
-    @commands.command(aliases=["rl","レジストリスト"])
-    async def registlist(self, ctx,page:int=1):
+    @commands.command(aliases=["rl","レジスタードリスト"])
+    async def registeredlist(self, ctx,page:int=1):
 
         self.update_db()
-        keys = list(self.register_dict.keys())
+        keys = list(self.registered_dict.keys())
         msg = "```md\n# 【登録済みキーリストくん】\n/rl [Page] でページ指定ｗ\n\n"
         
         start = (page*20)-20
@@ -29,7 +29,7 @@ class MessageRegister(commands.Cog):
             return
 
         for index, key in enumerate(keys[start:end],start=start+1):
-            msg += str(index)+". " + key + " - " + self.register_dict[key][:15].replace("\n","") +"\n"
+            msg += str(index)+". " + key + " - " + self.registered_dict[key][:15].replace("\n","") +"\n"
         else:
             end = index
 
@@ -38,8 +38,14 @@ class MessageRegister(commands.Cog):
 
         await ctx.send(msg)
 
-    @commands.command(aliases=["rm","レジストメッセージ"])
-    async def registmessage(self, ctx, key:str = None):
+    @commands.command(aliases=["rrm","ランダムレジスターメッセージ"])
+    async def randomregistermessage(self,ctx):
+        self.update_db()
+        picked = random.choice(list(self.registered_dict.values()))
+        await ctx.send(picked)
+
+    @commands.command(aliases=["rm","レジスターメッセージ"])
+    async def registermessage(self, ctx, key:str = None):
 
         if ctx.message.reference == None:
             await ctx.send("このコマンドは返信\n # と一緒に\n # 利用してみてねｗ←ｗ")
@@ -60,12 +66,12 @@ class MessageRegister(commands.Cog):
 
         self.update_db()
 
-        toroku = "上書き" if key in self.register_dict else "登録"
+        toroku = "上書き" if key in self.registered_dict else "登録"
         
-        self.register_dict[key] = content[:1999]
+        self.registered_dict[key] = content[:1999]
         
         with open(self.PATH,"w",encoding="UTF-8") as f:
-            json.dump(self.register_dict,f,indent=2,ensure_ascii=False)
+            json.dump(self.registered_dict,f,indent=2,ensure_ascii=False)
 
         await ctx.send("メッセージ を キー：" + key + " で"+toroku+"しましたｗ")
         
@@ -78,10 +84,10 @@ class MessageRegister(commands.Cog):
         
         self.update_db()
 
-        if msg.content not in self.register_dict.keys():
+        if msg.content not in self.registered_dict.keys():
             return
         
-        await msg.channel.send(self.register_dict[msg.content])
+        await msg.channel.send(self.registered_dict[msg.content])
         
         
 
