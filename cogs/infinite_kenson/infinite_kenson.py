@@ -29,7 +29,7 @@ class InfiniteKenson(commands.Cog):
                 for sample in sampled:
                     msgs += sample
                     if random.randrange(10) == 0:   
-                        msgs += target.nick + random.choice(["さんはそう思うんだよね","さん、",
+                        msgs += target.name if target.nick == None else target.nick + random.choice(["さんはそう思うんだよね","さん、",
                                                              "さんの意見だけど","は？","って名前ダサいよね","さんは本当にそう思ってる？",
                                                              "さんに同意はするけど","さんはどうなの？"])
                     if random.randrange(20) == 0:   
