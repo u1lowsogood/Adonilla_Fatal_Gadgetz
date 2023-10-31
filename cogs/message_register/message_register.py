@@ -41,8 +41,9 @@ class MessageRegister(commands.Cog):
     @commands.command(aliases=["rrm","ランダムレジスターメッセージ"])
     async def randomregistermessage(self,ctx):
         self.update_db()
-        picked = random.choice(list(self.registered_dict.values()))
-        await ctx.send(picked)
+        picked_key = random.choice(list(self.registered_dict.keys()))
+        await ctx.send("```md\n# 「"+picked_key+"」\n```")
+        await ctx.send(self.registered_dict[picked_key])
 
     @commands.command(aliases=["rm","レジスターメッセージ"])
     async def registermessage(self, ctx, key:str = None):
@@ -73,7 +74,7 @@ class MessageRegister(commands.Cog):
         with open(self.PATH,"w",encoding="UTF-8") as f:
             json.dump(self.registered_dict,f,indent=2,ensure_ascii=False)
 
-        await ctx.send("メッセージ を キー：" + key + " で"+toroku+"しましたｗ")
+        await ctx.send("メッセージを「" + key + "」で"+toroku+"しましたｗ")
         
 
     @commands.Cog.listener()
