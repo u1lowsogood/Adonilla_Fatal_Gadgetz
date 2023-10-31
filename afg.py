@@ -36,5 +36,6 @@ async def on_ready():
     await bot.load_extension("cogs.message_register.message_register")
     await bot.load_extension("cogs.selfmention.selfmention")
     await bot.load_extension("cogs.generatemap.generatemap")
-
+    await bot.load_extension("cogs.infinite_kenson.infinite_kenson")
+    
 bot.run(TOKEN)
