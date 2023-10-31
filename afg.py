@@ -37,5 +37,6 @@ async def on_ready():
     await bot.load_extension("cogs.selfmention.selfmention")
     await bot.load_extension("cogs.generatemap.generatemap")
     await bot.load_extension("cogs.infinite_kenson.infinite_kenson")
+    await bot.load_extension("cogs.random_music.randommusic")
     
 bot.run(TOKEN)
