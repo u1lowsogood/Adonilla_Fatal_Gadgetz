@@ -10,7 +10,7 @@ class RandomMusic(commands.Cog):
         self.bot = bot
         self.pattern = "https?://[\w/:%#\$&\?\(\)~\.=\+\-]+"
         self.channel = self.bot.get_channel(745417276919906305)
-        self.limit = 600
+        self.limit = 1200
 
     def random_datetime(self, start_datetime, end_datetime):
         time_difference = end_datetime - start_datetime
@@ -43,7 +43,7 @@ class RandomMusic(commands.Cog):
                 
             await searching.edit(content=f"検索中……({time}/{self.limit})")
                 
-            if time > 500:
+            if time > self.limit:
                 await searching.edit(content="曲を見つけられませんでした……ｗ\n（ランダムに検索しているので運が悪い可能性もあるｗ\n（その場合は再トライしてみてねｗ））")
                 return
 
