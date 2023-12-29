@@ -39,6 +39,7 @@ class RandomMusic(commands.Cog):
                 else:
                     await searching.delete()
                     await ctx.send(random.choice(url_list))
+                    await ctx.send("jump to music: " + message.jump_url)
                     return
                 
             await searching.edit(content=f"検索中……({time}/{self.limit})")
