@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 from PIL import Image, ImageDraw, ImageFont
 
-def cv2_putText(img, text, org, fontFace, fontScale, color, mode=None, anchor=None):
+def cv2_putText(img, text, org, fontFace, fontScale, color, mode=None, anchor=None, rotate=False):
     """
     mode:
         0:left bottom, 1:left ascender, 2:middle middle,
@@ -42,6 +42,9 @@ def cv2_putText(img, text, org, fontFace, fontScale, color, mode=None, anchor=No
     if xR<=0 or xL>=img_w or yB<=0 or yT>=img_h:
         print("out of bounds")
         return img
+    
+    if rotate:
+        img = np.rot90(img)
 
     # ROIを取得する
     x1, y1 = max([xL, 0]), max([yT, 0])

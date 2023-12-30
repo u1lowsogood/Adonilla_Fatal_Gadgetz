@@ -12,8 +12,7 @@ class Daibendori(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=["dbd","代弁鳥"])
-    async def daibendori(self,ctx,*input):
-        text = ' '.join(input)
+    async def daibendori(self,ctx,*,text):
         putpoint = [["db1.png",210,430],["db2.png",215,400],["db3.png",207,380],["db4.png",210,400]]
 
         choiced = random.choice(putpoint)
