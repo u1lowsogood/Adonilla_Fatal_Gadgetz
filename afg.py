@@ -40,5 +40,6 @@ async def on_ready():
     await bot.load_extension("cogs.random_music.randommusic")
     await bot.load_extension("cogs.daibendori.daibendori")
     await bot.load_extension("cogs.yugamismile.yugamismile")
+    await bot.load_extension("cogs.otanishohei.otanishohei")
     
 bot.run(TOKEN)
