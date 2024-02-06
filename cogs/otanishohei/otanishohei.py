@@ -24,7 +24,7 @@ class OtaniShohei(commands.Cog):
 
         for i, h in enumerate(hour):
             for m in move:
-                puttext.cv2_putText(img, h, (155-(i*36) + m[0], 385+m[1]), "./cogs/otanishohei/BIZUDPGothic-Bold.ttf", 50, (255,255,255), anchor="lt")
+                puttext.cv2_putText(img, h, (155-(i*36) + m[0], 385+m[1]), "./cogs/otanishohei/BIZUDPGothic-Bold.ttf", 50, (253,249,246), anchor="lt")
             puttext.cv2_putText(img, h, (155-(i*36), 385), "./cogs/otanishohei/BIZUDPGothic-Regular.ttf", 50, (186,209,225), anchor="lt")
 
         img_bytes = cv2.imencode('.png', img)[1].tobytes()
