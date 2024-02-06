@@ -37,7 +37,8 @@ cogz = [
     "cogs.random_music.randommusic",
     "cogs.daibendori.daibendori",
     "cogs.yugamismile.yugamismile",
-    "cogs.otanishohei.otanishohei"
+    "cogs.otanishohei.otanishohei",
+    "cogs.uikittest.uikittest"
         ]
 
 #畳【み【して ) み【た！【み！
