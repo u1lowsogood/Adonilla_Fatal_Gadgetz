@@ -38,7 +38,8 @@ cogz = [
     "cogs.daibendori.daibendori",
     "cogs.yugamismile.yugamismile",
     "cogs.otanishohei.otanishohei",
-    "cogs.uikittest.uikittest"
+    "cogs.uikittest.uikittest",
+    "cogs.u1quiz.u1quiz"
         ]
 
 #畳【み【して ) み【た！【み！
