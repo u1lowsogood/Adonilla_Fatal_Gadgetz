@@ -18,7 +18,7 @@ class Score():
 
     def getfinalresultmsg(self):
         score = 0
-        result = "# 【終了！】\n```md\n# 【RESULT】\n```\n"
+        result = "# 【終了！】\n```md\n# 【合否判定】\n```\n"
         for i, record in enumerate(self.records):
             score = score+1 if record.iscorrect else score
             result += ":white_check_mark: **正解！**\n" if record.iscorrect else ":x:  **不正解……**\n"
@@ -29,38 +29,40 @@ class Score():
     
     def getmastery(self,score):
         mastery = [
-            "ゆういちプロフェッショナル",
+            "アルティメット・ゆういちプロフェッショナル",
             "ゆういちマニア",
-            "ゆういち好き",
-            "not ゆういち",
-            "冒涜 いちろう",
-            "ゆう無知ろう"
+            "中級いちろう",
+            "ゆう無知ろう",
+            "ゆういち以外の概念ならすべて知ってる"
             ]
         return mastery[len(mastery) - score]
 
 class Choice(discord.ui.Button):
-    def __init__(self,label,currentquestion,nextquestion,score,correct=False):
+    def __init__(self,label,challanger,currentquestion,nextquestion,score,correct=False):
         super().__init__(label=label,style=discord.ButtonStyle.success)
         if correct:
             self.custom_id="correct"
         self.currentquestion = currentquestion
         self.score = score
         self.nextquestion = nextquestion
+        self.challanger = challanger
 
     async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.challanger.id:
+            await interaction.response.send_message("他人のクイズには回答できないよ。\n/u1quiz コマンドでプレイできるよ。")
+            return
         await interaction.response.defer()
-        #await interaction.response.send_message(content="：｝",delete_after=1)
         self.score.addanswerrecord(AnswerRecord(self.currentquestion,self.label, self.custom_id=="correct"))
         await self.nextquestion()
 
         
 class ChoicesView(discord.ui.View):
-    def __init__(self,callback,question,score):
+    def __init__(self,challanger,callback,question,score):
         super().__init__(timeout=180)
 
         for choice in random.sample(question.choices,len(question.choices)):
             #正解の選択肢ならcorrect=Trueにして送信
-            self.add_item(Choice(choice,question,callback,score,True) if choice == question.choices[0] else Choice(choice,question,callback,score))
+            self.add_item(Choice(choice,challanger,question,callback,score,True) if choice == question.choices[0] else Choice(choice,challanger,question,callback,score))
     
 
 class Quiz():
@@ -107,7 +109,7 @@ class Quiz():
         
         currentquestion = self.questions[self.current]
 
-        choicesview = ChoicesView(self.next, currentquestion, self.score)
+        choicesview = ChoicesView(self.challanger, self.next, currentquestion, self.score)
 
         question_message = f"```md\n# 【第 {self.current+1} / {self.qnum} 問】\n{currentquestion.question}\n```"
 
@@ -118,7 +120,7 @@ class Quiz():
         self.current += 1
 
     async def finish(self):
-        await self.ctx.send(self.score.getfinalresultmsg())
+        await self.msg.edit(content=self.score.getfinalresultmsg() + "\n"+ self.challanger.mention,view=None)
 
 
 class U1quiz(commands.Cog):
@@ -128,7 +130,7 @@ class U1quiz(commands.Cog):
     @commands.command()
     async def u1quiz(self, ctx):
 
-        quiz = Quiz(ctx,6)
+        quiz = Quiz(ctx,5)
         await quiz.start()
 
 async def setup(bot):
