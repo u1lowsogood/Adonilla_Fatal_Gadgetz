@@ -62,5 +62,6 @@ cogz = [
 async def on_ready():
     for kog in cogz:
         await bot.load_extension(kog)
+        print(f"{kog} was loaded!")
     
 bot.run(TOKEN)
