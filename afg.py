@@ -6,8 +6,8 @@ from discord.ext import tasks, commands
 import sys
 
 args = sys.argv
-if len(args) != 2:
-    print("ｳﾝﾁｗｳﾝﾁｗｳﾝﾁｗｳﾝﾁｗｳﾝﾁｗｳﾝﾁｗｳﾝﾁｗｳﾝﾁｗ（訳：どうやら トークンの アレ違うっぽいっすね……ｗ（笑）")
+if len(args) != 4:
+    print("ｳﾝﾁｗｳﾝﾁｗｳﾝﾁｗｳﾝﾁｗｳﾝﾁｗｳﾝﾁｗｳﾝﾁｗｳﾝﾁｗ（訳：引数周辺のアレがアレっぽいワｗ（笑）")
     sys.exit(1)
 
 TOKEN = args[1]
@@ -18,8 +18,21 @@ intents.message_content = True
 intents.members = True
 intents.reactions = True
 
-#Bot（Clientのサブクラス）登録【してみた！)
-bot = commands.Bot(command_prefix="/",intents=intents)
+class afgBot(commands.Bot):
+    def __init__(self):
+        super().__init__(command_prefix="/",intents=intents)
+        self._sqluser = args[2]
+        self._sqlpassword = args[3]
+    
+    @property
+    def sqluser(self):
+        return self._sqluser
+    
+    @property
+    def sqlpassword(self):
+        return self._sqlpassword
+        
+bot = afgBot()
 
 cogz = [
     "cogs.pinch.pinch",
@@ -39,7 +52,8 @@ cogz = [
     "cogs.yugamismile.yugamismile",
     "cogs.otanishohei.otanishohei",
     "cogs.uikittest.uikittest",
-    "cogs.u1quiz.u1quiz"
+    "cogs.u1quiz.u1quiz",
+    "cogs.deathsenryu.deathsenryu"
         ]
 
 #畳【み【して ) み【た！【み！
