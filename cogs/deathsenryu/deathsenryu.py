@@ -114,6 +114,32 @@ class DeathSenryu(commands.Cog):
         self.bot = bot
 
     @commands.command()
+    async def cimerasenryu(self, ctx, amount :int = 3):
+        if amount < 1:
+            await ctx.send("数字が小さすぎる")
+            return
+        elif amount > 11:
+            await ctx.send("数字が大きすぎる（１０以下で……ｗ）")
+            return
+        
+        with psycopg2.connect(user=self.bot.sqluser, password=self.bot.sqlpassword,host="localhost", port="5432", dbname="deathsenryu") as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(f"SELECT * FROM deathsenryu ORDER BY random() limit {amount}")
+                rows = cur.fetchall()
+
+                bunsetus = []
+
+                for row in rows:
+                    splited_senryu = row["senryu"].split()
+                    bunsetus.append(random.choice(splited_senryu))
+
+                content = f"```md\n#【デスキメラ川柳】\n```\n"
+
+                for bunsetu in bunsetus:
+                    content += f"> **{bunsetu}**\n"
+                await ctx.message.reply(content)
+
+    @commands.command()
     async def deathsenryu(self, ctx):
         await self.kokodeikku(ctx.message)
 
