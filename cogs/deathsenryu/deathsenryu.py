@@ -13,9 +13,10 @@ class ShowedSenryuRemoveView(discord.ui.View):
         await interaction.message.delete()
 
 class IkkuReadingModal(discord.ui.Modal,title="川柳を詠む"):
-    def __init__(self,replyto):
+    def __init__(self,replyto,bot):
         super().__init__(timeout=None)
         self.replyto: discord.Message = replyto
+        self.bot = bot
 
     senryu = discord.ui.TextInput(
         label='スペース区切りで一句！',
@@ -49,6 +50,9 @@ class IkkuReadingModal(discord.ui.Modal,title="川柳を詠む"):
             "いとおかし"
         ]
 
+        if(len(self.senryu.value)<3):
+            return
+
         content = "```md\n# 【" + random.choice(header) + "】\n```\n"
         for bunsetu in self.senryu.value.split():
             content += f"> **{bunsetu}**\n"
@@ -77,22 +81,29 @@ class IkkuReadingModal(discord.ui.Modal,title="川柳を詠む"):
                     cur.execute(sql, (self.replyto.author.id, senryu))
                     #print(f"sql inserted: {senryu}")
         except:
-            print("今はSQLサーバーが動いてないっぽいンゴねぇｗ")
+            print("something happen w")
 
 class KokodeIkkuView(discord.ui.View):
 
-    def __init__(self,replyto):
+    def __init__(self,replyto,bot):
         super().__init__(timeout=300)
         self.replyto = replyto
+        self.bot = bot
     
     @discord.ui.button(label="詠む！", style=discord.ButtonStyle.green)
     async def ok(self, interaction : discord.ui.Button, button: discord.Interaction):
-        inputmodal = IkkuReadingModal(self.replyto)
+        if interaction.user.id != self.replyto.author.id:
+            await interaction.response.send_message("他人の川柳を勝手に詠めないよ\n/deathsenryu コマンドで一句読めるよ")
+            return
+        inputmodal = IkkuReadingModal(self.replyto,self.bot)
         await interaction.response.send_modal(inputmodal)
         await interaction.message.delete()
 
     @discord.ui.button(label="またこんど", style=discord.ButtonStyle.gray)
     async def ng(self, interaction : discord.ui.Button, button: discord.Interaction):
+        if interaction.user.id != self.replyto.author.id:
+            await interaction.response.send_message("他人の川柳を勝手に消すな！ｗ")
+            return
         await interaction.message.delete()
         
 class DeathSenryu(commands.Cog):
@@ -114,7 +125,7 @@ class DeathSenryu(commands.Cog):
     
     @commands.Cog.listener(name="on_message")
     async def senryu_verdict(self,msg : discord.Message):
-        if msg.author == self.bot.user or msg.author.bot or msg.content[0]=="/":
+        if msg.author == self.bot.user or msg.author.bot or "/" in msg.content:
             return
         if random.randint(0,999) < self.show_permille:
             await self.showrandomsenryu(msg)
@@ -137,7 +148,7 @@ class DeathSenryu(commands.Cog):
             "川柳グランプリ開催！"
         ]
 
-        view = KokodeIkkuView(msg)
+        view = KokodeIkkuView(msg,self.bot)
         await msg.reply(content=random.choice(askikkumsgs), view=view)
 
     async def showrandomsenryu(self,msg : discord.Message):
