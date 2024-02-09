@@ -109,8 +109,10 @@ class KokodeIkkuView(discord.ui.View):
 class DeathSenryu(commands.Cog):
             
     def __init__(self, bot):
-        self.show_permille = 5*10
-        self.read_permille = 5*10
+        self.show_permille = 30*10
+        self.read_permille = 30*10
+        self.hindo = 20
+        self.sended_amount = 0
         self.bot = bot
 
     @commands.command()
@@ -152,6 +154,9 @@ class DeathSenryu(commands.Cog):
     @commands.Cog.listener(name="on_message")
     async def senryu_verdict(self,msg : discord.Message):
         if msg.author == self.bot.user or msg.author.bot or "/" in msg.content:
+            return
+        self.sended_amount += 1
+        if self.sended_amount % self.hindo != 1:
             return
         if random.randint(0,999) < self.show_permille:
             await self.showrandomsenryu(msg)

@@ -34,6 +34,7 @@ class afgBot(commands.Bot):
         
 bot = afgBot()
 
+#上から読み込まれるからデバッグしたい新規機能は上から追加したほうがいいかも？
 cogz = [
     "cogs.pinch.pinch",
     "cogs.reloader.reloader",
