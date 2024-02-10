@@ -36,6 +36,7 @@ bot = afgBot()
 
 #上から読み込まれるからデバッグしたい新規機能は上から追加したほうがいいかも？
 cogz = [
+    "cogs.translate.translate",
     "cogs.pinch.pinch",
     "cogs.reloader.reloader",
     "cogs.satujin.satujin",
@@ -64,5 +65,6 @@ async def on_ready():
     for kog in cogz:
         await bot.load_extension(kog)
         print(f"{kog} was loaded!")
-    
+    print(f"< all cogs were successfully loaded! >\n")
+
 bot.run(TOKEN)
