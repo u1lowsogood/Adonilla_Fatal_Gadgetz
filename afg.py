@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import asyncio
+from typing import Any, Coroutine, Optional
 import discord
 from discord.ext import tasks, commands
 import sys
@@ -31,6 +32,7 @@ class afgBot(commands.Bot):
     @property
     def sqlpassword(self):
         return self._sqlpassword
+    
         
 bot = afgBot()
 
