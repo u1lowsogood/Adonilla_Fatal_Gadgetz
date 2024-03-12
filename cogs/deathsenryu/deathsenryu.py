@@ -8,7 +8,7 @@ class ShowedSenryuRemoveView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=180)
 
-    @discord.ui.button(label="SHUT UP", style=discord.ButtonStyle.green)
+    @discord.ui.button(label=":{", style=discord.ButtonStyle.red)
     async def ng(self, interaction : discord.ui.Button, button: discord.Interaction):
         await interaction.message.delete()
 
@@ -124,7 +124,7 @@ class DeathSenryu(commands.Cog):
             await ctx.send("数字が大きすぎる（１０以下で……ｗ）")
             return
         
-        with psycopg2.connect(user=self.bot.sqluser, password=self.bot.sqlpassword,host="localhost", port="5432", dbname="deathsenryu") as conn:
+        with psycopg2.connect(user=self.bot.sqluser, password=self.bot.sqlpassword, host="localhost", port="5432", dbname="deathsenryu") as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
                 cur.execute(f"SELECT * FROM deathsenryu ORDER BY random() limit {amount}")
                 rows = cur.fetchall()
@@ -139,6 +139,39 @@ class DeathSenryu(commands.Cog):
 
                 for bunsetu in bunsetus:
                     content += f"> **{bunsetu}**\n"
+                await ctx.message.reply(content)
+
+    @commands.command()
+    async def moviesenryu(self, ctx):
+        with psycopg2.connect(user=self.bot.sqluser, password=self.bot.sqlpassword, host="localhost", port="5432", dbname="deathsenryu") as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(f"SELECT * FROM deathsenryu ORDER BY random() limit {1}")
+                row = cur.fetchone()
+                splited_senryu = row["senryu"].split()
+                senryu = random.choice(splited_senryu)
+
+                content = f"```md\n#【デスムービー川柳】\n```\n"
+
+                titles = [
+                ["ハリー・ポッターと"],
+                ["鬼滅の刃","編"],
+                ["千と千尋の"],
+                ["アナと","の女王"],
+                ["ロード・オブ・ザ"],
+                ["となりの"],
+                ["魔女の","便"],
+                ["ドラえもん のび太の"],
+                ["バック・トゥー・ザ"],
+                ["映画クレヨンしんちゃん"],
+                ["101匹"],
+                ["花束みたいな","をした"],
+                ["シン・"]]
+
+                title = random.choice(titles)
+                content += f"> **{title[0]}**\n"
+                content += f"> **{senryu}**"
+                content += f" **{title[1]}**" if len(title) > 1 else ""
+
                 await ctx.message.reply(content)
 
     @commands.command()

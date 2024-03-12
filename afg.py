@@ -57,7 +57,8 @@ cogz = [
     "cogs.otanishohei.otanishohei",
     "cogs.uikittest.uikittest",
     "cogs.u1quiz.u1quiz",
-    "cogs.deathsenryu.deathsenryu"
+    "cogs.deathsenryu.deathsenryu",
+    "cogs.n.n"
         ]
 
 #畳【み【して ) み【た！【み！
