@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import asyncio
+from typing import Any, Coroutine, Optional
 import discord
 from discord.ext import tasks, commands
 import sys
@@ -31,11 +32,13 @@ class afgBot(commands.Bot):
     @property
     def sqlpassword(self):
         return self._sqlpassword
+    
         
 bot = afgBot()
 
 #上から読み込まれるからデバッグしたい新規機能は上から追加したほうがいいかも？
 cogz = [
+    "cogs.translate.translate",
     "cogs.pinch.pinch",
     "cogs.reloader.reloader",
     "cogs.satujin.satujin",
@@ -54,7 +57,8 @@ cogz = [
     "cogs.otanishohei.otanishohei",
     "cogs.uikittest.uikittest",
     "cogs.u1quiz.u1quiz",
-    "cogs.deathsenryu.deathsenryu"
+    "cogs.deathsenryu.deathsenryu",
+    "cogs.n.n"
         ]
 
 #畳【み【して ) み【た！【み！
@@ -64,5 +68,6 @@ async def on_ready():
     for kog in cogz:
         await bot.load_extension(kog)
         print(f"{kog} was loaded!")
-    
+    print(f"< all cogs were successfully loaded! >\n")
+
 bot.run(TOKEN)
