@@ -58,7 +58,8 @@ cogz = [
     "cogs.uikittest.uikittest",
     "cogs.u1quiz.u1quiz",
     "cogs.deathsenryu.deathsenryu",
-    "cogs.n.n"
+    "cogs.n.n",
+    "cogs.autonerd.autonerd"
         ]
 
 #畳【み【して ) み【た！【み！
