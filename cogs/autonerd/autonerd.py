@@ -65,6 +65,9 @@ class AutoNerd(commands.Cog):
         
         if self.sended_amount > self.next_amount:
 
+            self.next_amount = random.randint(8,25)
+            self.sended_amount = 0
+
             choiced = random.choice(self.reactions).replace(' ', '')
             for emoji in choiced:
                 try:
@@ -72,8 +75,7 @@ class AutoNerd(commands.Cog):
                 except discord.errors.HTTPException:
                     print("Unknown emoji:" , emoji)
 
-            self.next_amount = random.randint(8,25)
-            self.sended_amount = 0
+
             return
 
 async def setup(bot):
