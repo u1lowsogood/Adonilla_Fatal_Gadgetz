@@ -54,6 +54,7 @@ class AutoNerd(commands.Cog):
             "🤓 💡",
             "🤓🇸 🇪 🇽",
             "🤓🩻",
+            "🪓🤓"
             ]
 
     @commands.Cog.listener(name="on_message")
@@ -65,7 +66,7 @@ class AutoNerd(commands.Cog):
         
         if self.sended_amount > self.next_amount:
 
-            self.next_amount = random.randint(8,25)
+            self.next_amount = random.randint(8,20)
             self.sended_amount = 0
 
             choiced = random.choice(self.reactions).replace(' ', '')
