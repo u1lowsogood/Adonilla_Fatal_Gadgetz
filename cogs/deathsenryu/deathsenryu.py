@@ -8,14 +8,15 @@ class ShowedSenryuRemoveView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=180)
 
-    @discord.ui.button(label="SHUT UP", style=discord.ButtonStyle.green)
+    @discord.ui.button(label=":{", style=discord.ButtonStyle.red)
     async def ng(self, interaction : discord.ui.Button, button: discord.Interaction):
         await interaction.message.delete()
 
 class IkkuReadingModal(discord.ui.Modal,title="川柳を詠む"):
-    def __init__(self,replyto):
+    def __init__(self,replyto,bot):
         super().__init__(timeout=None)
         self.replyto: discord.Message = replyto
+        self.bot = bot
 
     senryu = discord.ui.TextInput(
         label='スペース区切りで一句！',
@@ -49,6 +50,9 @@ class IkkuReadingModal(discord.ui.Modal,title="川柳を詠む"):
             "いとおかし"
         ]
 
+        if(len(self.senryu.value)<3):
+            return
+
         content = "```md\n# 【" + random.choice(header) + "】\n```\n"
         for bunsetu in self.senryu.value.split():
             content += f"> **{bunsetu}**\n"
@@ -77,30 +81,98 @@ class IkkuReadingModal(discord.ui.Modal,title="川柳を詠む"):
                     cur.execute(sql, (self.replyto.author.id, senryu))
                     #print(f"sql inserted: {senryu}")
         except:
-            print("今はSQLサーバーが動いてないっぽいンゴねぇｗ")
+            print("something happen w")
 
 class KokodeIkkuView(discord.ui.View):
 
-    def __init__(self,replyto):
+    def __init__(self,replyto,bot):
         super().__init__(timeout=300)
         self.replyto = replyto
+        self.bot = bot
     
     @discord.ui.button(label="詠む！", style=discord.ButtonStyle.green)
     async def ok(self, interaction : discord.ui.Button, button: discord.Interaction):
-        inputmodal = IkkuReadingModal(self.replyto)
+        if interaction.user.id != self.replyto.author.id:
+            await interaction.response.send_message("他人の川柳を勝手に詠めないよ\n/deathsenryu コマンドで一句読めるよ")
+            return
+        inputmodal = IkkuReadingModal(self.replyto,self.bot)
         await interaction.response.send_modal(inputmodal)
         await interaction.message.delete()
 
     @discord.ui.button(label="またこんど", style=discord.ButtonStyle.gray)
     async def ng(self, interaction : discord.ui.Button, button: discord.Interaction):
+        if interaction.user.id != self.replyto.author.id:
+            await interaction.response.send_message("他人の川柳を勝手に消すな！ｗ")
+            return
         await interaction.message.delete()
         
 class DeathSenryu(commands.Cog):
             
     def __init__(self, bot):
-        self.show_permille = 5*10
-        self.read_permille = 5*10
+        self.show_permille = 40*10
+        self.read_permille = 40*10
+        self.hindo = 15
+        self.sended_amount = 0
         self.bot = bot
+
+    @commands.command()
+    async def cimerasenryu(self, ctx, amount :int = 3):
+        if amount < 1:
+            await ctx.send("数字が小さすぎる")
+            return
+        elif amount > 11:
+            await ctx.send("数字が大きすぎる（１０以下で……ｗ）")
+            return
+        
+        with psycopg2.connect(user=self.bot.sqluser, password=self.bot.sqlpassword, host="localhost", port="5432", dbname="deathsenryu") as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(f"SELECT * FROM deathsenryu ORDER BY random() limit {amount}")
+                rows = cur.fetchall()
+
+                bunsetus = []
+
+                for row in rows:
+                    splited_senryu = row["senryu"].split()
+                    bunsetus.append(random.choice(splited_senryu))
+
+                content = f"```md\n#【デスキメラ川柳】\n```\n"
+
+                for bunsetu in bunsetus:
+                    content += f"> **{bunsetu}**\n"
+                await ctx.message.reply(content)
+
+    @commands.command()
+    async def moviesenryu(self, ctx):
+        with psycopg2.connect(user=self.bot.sqluser, password=self.bot.sqlpassword, host="localhost", port="5432", dbname="deathsenryu") as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(f"SELECT * FROM deathsenryu ORDER BY random() limit {1}")
+                row = cur.fetchone()
+                splited_senryu = row["senryu"].split()
+                senryu = random.choice(splited_senryu)
+
+                content = f"```md\n#【デスムービー川柳】\n```\n"
+
+                titles = [
+                ["ハリー・ポッターと"],
+                ["鬼滅の刃","編"],
+                ["千と千尋の"],
+                ["アナと","の女王"],
+                ["ロード・オブ・ザ"],
+                ["となりの"],
+                ["魔女の","便"],
+                ["ドラえもん のび太の"],
+                ["バック・トゥー・ザ"],
+                ["映画クレヨンしんちゃん"],
+                ["101匹"],
+                ["花束みたいな","をした"],
+                ["シン・"]]
+
+                title = random.choice(titles)
+                content += f"> **{title[0]}**\n"
+                content += f"> **{senryu}**"
+                content += f" **{title[1]}**" if len(title) > 1 else ""
+
+                await ctx.message.reply(content)
 
     @commands.command()
     async def deathsenryu(self, ctx):
@@ -114,7 +186,10 @@ class DeathSenryu(commands.Cog):
     
     @commands.Cog.listener(name="on_message")
     async def senryu_verdict(self,msg : discord.Message):
-        if msg.author == self.bot.user or msg.author.bot or msg.content[0]=="/":
+        if msg.author == self.bot.user or msg.author.bot or "/" in msg.content:
+            return
+        self.sended_amount += 1
+        if self.sended_amount % self.hindo != 1:
             return
         if random.randint(0,999) < self.show_permille:
             await self.showrandomsenryu(msg)
@@ -137,7 +212,7 @@ class DeathSenryu(commands.Cog):
             "川柳グランプリ開催！"
         ]
 
-        view = KokodeIkkuView(msg)
+        view = KokodeIkkuView(msg,self.bot)
         await msg.reply(content=random.choice(askikkumsgs), view=view)
 
     async def showrandomsenryu(self,msg : discord.Message):
