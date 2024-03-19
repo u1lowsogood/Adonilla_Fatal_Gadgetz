@@ -22,15 +22,17 @@ class AutoNerd(commands.Cog):
             "🤓🇰🇦🇹🇴🇼",
             "🤓 🫳 👒",
             "👴🔪 🤓",
-            "👨‍🦰 ❤️ 👧💔🤓",
-            "👱‍♀️ 🤏 🤓",
-            "🤓 🙏 💦",
+            "👨‍🦰👧💔🤓",
+            "👱‍♀️🤏🤓",
+            "🤓🙏💦",
             "🤓 🤳",
             "🤓🫴🌹",
             "💥 👊 🤓",
             "💪 🤓🍤",
             "🫷 🤓 🫸",
             "👉🤓👈",
+            "🤓👉👈",
+            "👈🤓👉",
             "🤓 🫵",
             "🤓 🌧️",
             "🤓 🎌",
@@ -46,15 +48,21 @@ class AutoNerd(commands.Cog):
             "🤓 🏳️",
             "💰 🤓",
             "🤓 🎸",
-            "🤓 🫳 🀄",
-            "🤓 🎲 ",
+            "🤓🫳🀄",
+            "🤓🎲",
             "🤓 🍷 🌙",
             "🤓 🪭",
             "🤓 🖕",
             "🤓 💡",
             "🤓🇸 🇪 🇽",
             "🤓🩻",
-            "🪓🤓"
+            "🪓🤓",
+            "🗜️👈🤓💦",
+            "🎻🤓",
+            "❤️‍🩹🤓",
+            "🤓👉👌",
+            "🤓👉👌🇸 🇪 🇽",
+            "👨‍🦰🇸 🇪 🇽"
             ]
 
     @commands.Cog.listener(name="on_message")
@@ -69,13 +77,16 @@ class AutoNerd(commands.Cog):
             self.next_amount = random.randint(8,20)
             self.sended_amount = 0
 
-            choiced = random.choice(self.reactions).replace(' ', '')
-            for emoji in choiced:
+            #choiced = random.choice(self.reactions).replace(' ', '')
+            choicedindex = random.randrange(len(self.reactions))
+            choiced = self.reactions[choicedindex].replace(' ', '')
+
+            for i, emoji in enumerate(choiced):
                 try:
                     await msg.add_reaction(emoji)
                 except discord.errors.HTTPException:
-                    print("Unknown emoji:" , emoji)
-
+                    print("Unknown emoji")
+                    print("reaction_index:", choicedindex, "letter:", i, "emoji:", emoji)
 
             return
 
