@@ -31,6 +31,10 @@ class Utsu(commands.Cog):
         del canvas[-utsu_len:]
 
         msg = "\n".join(canvas)
+
+        if msg < 4000:
+            await ctx.send(f"文字数がデカすぎる……♡（４０００文字以内じゃないと送信できないので……）お前は{len(msg)}文字を作り出したねｗ")
+            return
         await ctx.send(msg)
 
     def put_utsu(self, canvas, drawmsgs, insert_x=0, insert_y=0):
