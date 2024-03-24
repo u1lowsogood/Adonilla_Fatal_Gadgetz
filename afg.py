@@ -61,7 +61,8 @@ cogz = [
     "cogs.n.n",
     "cogs.autonerd.autonerd",
     "cogs.utsu.utsu",
-    "cogs.word.word"
+    "cogs.word.word",
+    "cogs.fakegoogle.fakegoogle"
         ]
 
 #畳【み【して ) み【た！【み！
