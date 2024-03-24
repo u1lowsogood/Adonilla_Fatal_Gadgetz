@@ -59,7 +59,8 @@ cogz = [
     "cogs.u1quiz.u1quiz",
     "cogs.deathsenryu.deathsenryu",
     "cogs.n.n",
-    "cogs.autonerd.autonerd"
+    "cogs.autonerd.autonerd",
+    "cogs.utsu.utsu"
         ]
 
 #畳【み【して ) み【た！【み！
