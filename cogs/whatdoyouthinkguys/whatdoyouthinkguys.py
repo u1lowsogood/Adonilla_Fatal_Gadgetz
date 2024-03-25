@@ -28,8 +28,8 @@ class WhatDoYouThinkGuys(commands.Cog):
         
         resultmsg = "# 📰 結果発表\n"
 
-        for index, reaction in enumerate(votemsg.reactions):
-            think = " そう思う" if index==0 else " そう思わない" if index==1 else ""
+        for reaction in votemsg.reactions:
+            think = " そう思う" if reaction.emoji=="👍" else " そう思わない" if reaction.emoji=="👎" else ""
             resultmsg += f"- {reaction.emoji}{think}： **{reaction.count}票**\n"
 
         await votemsg.delete()
