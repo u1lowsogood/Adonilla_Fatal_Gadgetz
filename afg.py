@@ -64,7 +64,8 @@ cogz = [
     "cogs.word.word",
     "cogs.fakegoogle.fakegoogle",
     "cogs.kyuutou.kyuutou",
-    "cogs.randomhibari.randomhibari"
+    "cogs.randomhibari.randomhibari",
+    "cogs.whatdoyouthinkguys.whatdoyouthinkguys"
         ]
 
 #畳【み【して ) み【た！【み！
