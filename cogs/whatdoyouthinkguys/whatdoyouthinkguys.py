@@ -10,7 +10,7 @@ class WhatDoYouThinkGuys(commands.Cog):
     @commands.Cog.listener(name="on_message")
     async def whatdoyouthinkguys(self, msg : discord.Message):
 
-        doumou = ["みんなはどう思う？","みんなはどう思う?","みんなはどう思う"]
+        doumou = ["みんなはどう思う？","みんなはどう思う?","みんなはどう思う","皆はどう思う？","皆はどう思う?","皆はどう思う"]
         has_doumou = lambda: True in [doumo in msg.content for doumo in doumou]
 
         if msg.author.bot == True or not has_doumou():
