@@ -109,9 +109,9 @@ class KokodeIkkuView(discord.ui.View):
 class DeathSenryu(commands.Cog):
             
     def __init__(self, bot):
-        self.show_permille = 20*10
-        self.read_permille = 25*10
-        self.hindo = 23
+        self.show_permille = 15*10
+        self.read_permille = 20*10
+        self.hindo = 25
         self.sended_amount = 0
         self.bot = bot
 
