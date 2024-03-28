@@ -35,7 +35,7 @@ class AutoVcStatus(commands.Cog):
         "アドンイラ記念日通話",
         "ここで一句！",
         "ドラえもんのび太の",
-        "通話に入るな！",
+        "通話に入ると死亡",
         "🤓🖕 ",
         "人間牧場",
         "網走監獄",
@@ -79,12 +79,18 @@ class AutoVcStatus(commands.Cog):
         "♡ｶﾞSﾁ交ｱEｸ尾Xﾒ♡",
         "ウンコ耐久レース",
         "WarRock募集！",
-        "チャンネルステータスを設定♡"
+        "チャンネルステータスを設定♡",
+        "これエロすぎない？",
+        "エ配ロ信い",
+        "a------",
+        "履修登録中",
         ]
 
     @commands.Cog.listener(name="on_voice_state_update")
     async def word(self, member, before, after):
         connected: discord.VoiceChannel = after.channel
+        if connected == None:
+            return
         if len(connected.members) == 1:
             choicedstatus = random.choice(self.statuslib)
             await connected.edit(status=choicedstatus)
