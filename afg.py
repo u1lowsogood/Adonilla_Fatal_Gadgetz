@@ -18,6 +18,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 intents.reactions = True
+intents.voice_states = True
 
 class afgBot(commands.Bot):
     def __init__(self):
@@ -65,7 +66,8 @@ cogz = [
     "cogs.fakegoogle.fakegoogle",
     "cogs.kyuutou.kyuutou",
     "cogs.randomhibari.randomhibari",
-    "cogs.whatdoyouthinkguys.whatdoyouthinkguys"
+    "cogs.whatdoyouthinkguys.whatdoyouthinkguys",
+    "cogs.autovcstatus.autovcstatus"
         ]
 
 #畳【み【して ) み【た！【み！
