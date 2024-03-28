@@ -67,7 +67,8 @@ cogz = [
     "cogs.kyuutou.kyuutou",
     "cogs.randomhibari.randomhibari",
     "cogs.whatdoyouthinkguys.whatdoyouthinkguys",
-    "cogs.autovcstatus.autovcstatus"
+    "cogs.autovcstatus.autovcstatus",
+    "cogs.nerd_basami.nerd_basami"
         ]
 
 #畳【み【して ) み【た！【み！
