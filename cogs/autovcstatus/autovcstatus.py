@@ -86,8 +86,8 @@ class AutoVcStatus(commands.Cog):
         "履修登録中",
         ]
 
-    @commands.Cog.listener(name="on_voice_state_update")
-    async def word(self, member, before, after):
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, member, before, after):
         connected: discord.VoiceChannel = after.channel
         if connected == None:
             return
