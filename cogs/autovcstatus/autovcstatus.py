@@ -91,6 +91,9 @@ class AutoVcStatus(commands.Cog):
         connected: discord.VoiceChannel = after.channel
         if connected == None:
             return
+        if connected == before.channel:
+            return
+        
         if len(connected.members) == 1:
             choicedstatus = random.choice(self.statuslib)
             await connected.edit(status=choicedstatus)
