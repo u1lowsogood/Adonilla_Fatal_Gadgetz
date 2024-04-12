@@ -68,8 +68,9 @@ cogz = [
     "cogs.randomhibari.randomhibari",
     "cogs.whatdoyouthinkguys.whatdoyouthinkguys",
     "cogs.autovcstatus.autovcstatus",
-    "cogs.nerd_basami.nerd_basami"
-        ]
+    "cogs.nerd_basami.nerd_basami",
+    "cogs.movingutsu.movingutsu"
+    ]
 
 #畳【み【して ) み【た！【み！
 #エクステンションを有効化 テンション上がってきた……！
