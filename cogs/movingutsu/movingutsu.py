@@ -3,13 +3,13 @@ import random
 import asyncio
 import discord
 
-class Utsu(commands.Cog):
+class MovingUtsu(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["utsu","utsubyou","鬱","うつ","自殺"])
-    async def utubyou(self, ctx, width :int=20, height : int=7, amount :int = 5, times = 5):
+    @commands.command(aliases=["mutsubyou","mutu","mutsu"])
+    async def mutubyou(self, ctx, width :int=20, height : int=7, amount :int = 5, times = 5):
 
         drawmsgs = ["鬱病になって","自殺","してしまうよ！？"]
 
@@ -23,9 +23,9 @@ class Utsu(commands.Cog):
         sended : discord.Message = await ctx.send(msg[:2000])
 
         for i in range(times):
-            msg = self.drawutsus(width,height,drawmsgs,amount)
-            sended.edit(content=msg[:2000])
             await asyncio.sleep(1)
+            msg = self.drawutsus(width,height,drawmsgs,amount)
+            await sended.edit(content=msg[:2000])
     
     def drawutsus(self,width,height,drawmsgs,amount):
 
@@ -62,4 +62,4 @@ class Utsu(commands.Cog):
 
 
 async def setup(bot):
-    await bot.add_cog(Utsu(bot))
+    await bot.add_cog(MovingUtsu(bot))
