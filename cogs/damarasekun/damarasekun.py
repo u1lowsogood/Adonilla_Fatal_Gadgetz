@@ -16,13 +16,17 @@ class Damarasekun(commands.Cog):
             await ctx.channel.send("VC内で使ってねえ")
             return
         
-        players = member.voice.channel.connected.members
+        players = member.voice.channel.members
 
         spectators = [await commands.converter.MemberConverter().convert(ctx, member) for member in without]
-        players = filter(lambda : player not in spectators, players)
+        players = filter(lambda player : player not in spectators, players)
+
+        spec_str = ""
+        if len(spectators) > 0:
+            spec_str += "```md\n# 【観戦者】\n"+"\n".join([str(i+1)+". "+spec.display_name for i, spec in enumerate(spectators)])+"```"
         
         if self.n % 2 == 0:
-            await ctx.channel.send("スピーカーミュート開始！")
+            await ctx.channel.send("スピーカーミュート開始！"+spec_str)
             for player in players:
                 if player.voice.deaf == False:
                     await player.edit(deafen=True)
