@@ -10,25 +10,27 @@ class Damarasekun(commands.Cog):
         self.n = 0
 
     @commands.command(aliases=["黙らせ君","projectwinter","winter"])
-    async def damarasekun(self, ctx):
+    async def damarasekun(self, ctx, *without):
         member : discord.Member = ctx.message.author
         if member.voice == None:
             await ctx.channel.send("VC内で使ってねえ")
             return
         
-        connected: discord.VoiceChannel = member.voice.channel
+        players = member.voice.channel.connected.members
+
+        spectators = [await commands.converter.MemberConverter().convert(ctx, member) for member in without]
+        players = filter(lambda : player not in spectators, players)
         
         if self.n % 2 == 0:
             await ctx.channel.send("スピーカーミュート開始！")
-            for member in connected.members:
-                if member.voice.deaf == False:
-                    await member.edit(deafen=True)
+            for player in players:
+                if player.voice.deaf == False:
+                    await player.edit(deafen=True)
         else:
             await ctx.channel.send("スピーカーミュート解除！")
-            for member in connected.members:
-                if member.voice.deaf == True:
-                    await member.edit(deafen=False)
-
+            for player in players:
+                if player.voice.deaf == True:
+                    await player.edit(deafen=False)
         self.n += 1
 
 async def setup(bot):
