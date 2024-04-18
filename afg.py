@@ -69,7 +69,8 @@ cogz = [
     "cogs.whatdoyouthinkguys.whatdoyouthinkguys",
     "cogs.autovcstatus.autovcstatus",
     "cogs.nerd_basami.nerd_basami",
-    "cogs.movingutsu.movingutsu"
+    "cogs.movingutsu.movingutsu",
+    "cogs.damarasekun.damarasekun"
     ]
 
 #畳【み【して ) み【た！【み！
