@@ -70,7 +70,8 @@ cogz = [
     "cogs.autovcstatus.autovcstatus",
     "cogs.nerd_basami.nerd_basami",
     "cogs.movingutsu.movingutsu",
-    "cogs.damarasekun.damarasekun"
+    "cogs.damarasekun.damarasekun",
+    "cogs.kintamaoukoku.kintamaoukoku"
     ]
 
 #畳【み【して ) み【た！【み！
