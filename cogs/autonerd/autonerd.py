@@ -93,7 +93,7 @@ class AutoNerd(commands.Cog):
         
         if self.sended_amount > self.next_amount:
 
-            self.next_amount = random.randint(13,30)
+            self.next_amount = random.randint(19,40)
             self.sended_amount = 0
 
             #choiced = random.choice(self.reactions).replace(' ', '')
