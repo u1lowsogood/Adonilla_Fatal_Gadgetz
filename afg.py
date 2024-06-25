@@ -71,7 +71,8 @@ cogz = [
     "cogs.nerd_basami.nerd_basami",
     "cogs.movingutsu.movingutsu",
     "cogs.damarasekun.damarasekun",
-    "cogs.kintamaoukoku.kintamaoukoku"
+    "cogs.kintamaoukoku.kintamaoukoku",
+    "cogs.curse.curse",
     ]
 
 #畳【み【して ) み【た！【み！
