@@ -27,7 +27,7 @@ class eye:
         self.img_buffer = self.img.copy()
         self.mask_buffer = self.mask.copy()
         enhancer = ImageEnhance.Contrast(self.img_buffer)
-        self.img_buffer  = enhancer.enhance(2.5)
+        self.img_buffer  = enhancer.enhance(3)
 
         degree = random.randrange(-rotate_deg,rotate_deg)
         self.rotate(degree)
@@ -158,14 +158,14 @@ class Curse(commands.Cog):
         if max(width, height) > 1000:
             scale = 1000 / float(max(width, height))
 
-            origin_pil = origin_pil.resize((int(width * scale), int(height * scale)), Image.ANTIALIAS)
+            origin_pil = origin_pil.resize((int(width * scale), int(height * scale)))
 
         #顔面検知用
         cv2temp = np.asarray(origin_pil,dtype=np.uint8)
         face_cv2 = cv2.cvtColor(cv2temp, cv2.COLOR_RGB2BGR)
 
         enhancer = ImageEnhance.Brightness(origin_pil)  
-        origin_pil = enhancer.enhance(1.5)
+        origin_pil = enhancer.enhance(1.3)
 
         origin_pil = origin_pil.filter(ImageFilter.GaussianBlur(1.2))
 
@@ -203,8 +203,6 @@ class Curse(commands.Cog):
             edited_pil = blackfiller(edited_pil, mouth_points)    
 
         edited_pil = spiker(edited_pil)
-
-        edited_pil.save("cogs/curse/test.png")
 
         bio = io.BytesIO()
         edited_pil.save(bio, format='PNG')
