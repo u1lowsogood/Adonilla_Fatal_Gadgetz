@@ -73,6 +73,8 @@ cogz = [
     "cogs.damarasekun.damarasekun",
     "cogs.kintamaoukoku.kintamaoukoku"
     "cogs.todorate.todorate"
+    "cogs.kintamaoukoku.kintamaoukoku",
+    "cogs.curse.curse",
     ]
 
 #畳【み【して ) み【た！【み！
