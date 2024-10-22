@@ -163,3 +163,5 @@ cython_debug/
 launcher.bat
 cogs/message_register/register_db.json
 cogs/curse/shape_predictor_68_face_landmarks.dat
+cogs/message_register/register_db.json
+なんでか追加されてなかった
