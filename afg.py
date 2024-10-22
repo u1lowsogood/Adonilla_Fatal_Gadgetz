@@ -71,9 +71,10 @@ cogz = [
     "cogs.nerd_basami.nerd_basami",
     "cogs.movingutsu.movingutsu",
     "cogs.damarasekun.damarasekun",
-    "cogs.kintamaoukoku.kintamaoukoku"
+    "cogs.kintamaoukoku.kintamaoukoku",
     "cogs.curse.curse",
-    "cogs.todorate.todorate"
+    "cogs.todorate.todorate",
+    "cogs.depressed_battle.depressed_battle"
     ]
 
 #畳【み【して ) み【た！【み！
