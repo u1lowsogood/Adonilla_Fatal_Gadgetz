@@ -40,7 +40,7 @@ class DepressedBattle(commands.Cog):
     @commands.Cog.listener(name="on_message")
     async def emotioninsert(self,msg : discord.Message):
         text = msg.content
-        if text == "":
+        if text == "" or "/" in text:
             return
         emotions = self.emotion_detector(text)
         self.sqlinsert(msg.author.id, emotions["POSITIVE"], emotions["NEGATIVE"], emotions["NEUTRAL"])
@@ -212,39 +212,38 @@ class DepressedBattle(commands.Cog):
     def sqlinsert(self, author_id, positive_rate, negative_rate, neutral_rate):
         today = datetime.now().date()
         author_id = str(author_id)
-        try:
-            with psycopg2.connect(user=self.bot.sqluser, password=self.bot.sqlpassword, host="localhost", port="5432", dbname="depressed_battle") as conn:
-                with conn.cursor() as cur:
-                    cur.execute("""
-                        SELECT positive_rate, negative_rate, neutral_rate 
-                        FROM depressed 
-                        WHERE patient_uuid = %s AND created_at = %s
-                    """, (author_id, today))
-                    
-                    result = cur.fetchone()
-                    
-                    if result:
-                        current_positive, current_negative, current_neutral = result
-                        new_positive = (current_positive + positive_rate) / 2
-                        new_negative = (current_negative + negative_rate) / 2
-                        new_neutral = (current_neutral + neutral_rate) / 2
 
-                        cur.execute("""
-                            UPDATE depressed 
-                            SET positive_rate = %s, negative_rate = %s, neutral_rate = %s
-                            WHERE patient_uuid = %s AND created_at = %s
-                        """, (new_positive, new_negative, new_neutral, author_id, today))
-                    else:
-                        cur.execute("""
-                            INSERT INTO depressed (
-                                patient_uuid, positive_rate, negative_rate, neutral_rate, created_at
-                            ) VALUES (%s, %s, %s, %s, %s)
-                        """, (author_id, positive_rate, negative_rate, neutral_rate, today))
-                    
-                    conn.commit()
-                    #print(f"sql updated or inserted for {author_id}")
-        except Exception as e:
-            print(f"something happened: {e}")
+        with psycopg2.connect(user=self.bot.sqluser, password=self.bot.sqlpassword, host="localhost", port="5432", dbname="depressed_battle") as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT positive_rate, negative_rate, neutral_rate, amount 
+                    FROM depressed 
+                    WHERE patient_uuid = %s AND created_at = %s
+                """, (author_id, today))
+                
+                result = cur.fetchone()
+                
+                if result:
+                    current_positive, current_negative, current_neutral, current_amount = result
+                    new_amount = current_amount + 1
+
+                    new_positive = ((current_positive * current_amount) + positive_rate) / new_amount
+                    new_negative = ((current_negative * current_amount) + negative_rate) / new_amount
+                    new_neutral = ((current_neutral * current_amount) + neutral_rate) / new_amount
+
+                    cur.execute("""
+                        UPDATE depressed 
+                        SET positive_rate = %s, negative_rate = %s, neutral_rate = %s, amount = %s
+                        WHERE patient_uuid = %s AND created_at = %s
+                    """, (new_positive, new_negative, new_neutral, new_amount, author_id, today))
+                else:
+                    cur.execute("""
+                        INSERT INTO depressed (
+                            patient_uuid, positive_rate, negative_rate, neutral_rate, created_at, amount
+                        ) VALUES (%s, %s, %s, %s, %s, %s)
+                    """, (author_id, positive_rate, negative_rate, neutral_rate, today, 1))
+                
+                conn.commit()
 
 async def setup(bot):
     await bot.add_cog(DepressedBattle(bot))
