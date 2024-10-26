@@ -1,20 +1,28 @@
 from discord.ext import commands
 import discord.ext.commands
 import discord
+import discord.ext
 
 import psycopg2
 from psycopg2.extras import DictCursor
 
 from transformers import pipeline, AutoModelForSequenceClassification, BertJapaneseTokenizer,BertTokenizer, BertForSequenceClassification
-
 import torch
-from datetime import datetime
 
-import discord.ext
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import matplotlib.font_manager as fm
+import japanize_matplotlib
+
+import emoji
+from datetime import datetime, timedelta
+import io
+import re
 
 class DepressedBattle(commands.Cog):
 
     def __init__(self, bot):
+
         self.bot = bot
         # 精度微妙だったので他使う
         #self.classifier = pipeline(
@@ -105,7 +113,7 @@ class DepressedBattle(commands.Cog):
         return result
     
     @commands.command()
-    async def uturank(self, ctx, graph="total"):
+    async def uturank(self, ctx, graph="weekly"):
         if graph == "total":
             with psycopg2.connect(user=self.bot.sqluser, password=self.bot.sqlpassword, host="localhost", port="5432", dbname="depressed_battle") as conn:
                 with conn.cursor(cursor_factory=DictCursor) as cur:
@@ -136,12 +144,79 @@ class DepressedBattle(commands.Cog):
                     
                     await ctx.channel.send(sendtxt)
 
+        elif graph == "week" or graph == "weekly":
+            with psycopg2.connect(user=self.bot.sqluser, password=self.bot.sqlpassword, host="localhost", port="5432", dbname="depressed_battle") as conn:
+                with conn.cursor(cursor_factory=DictCursor) as cur:
+
+                    today = datetime.now().date()
+                    start_date = today - timedelta(days=7)
+
+                    colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+
+                    cur.execute("""
+                        SELECT 
+                            patient_uuid,
+                            SUM(negative_rate * amount) / SUM(amount) AS weighted_avg_negative_rate
+                        FROM depressed
+                        WHERE patient_uuid <> %s AND created_at BETWEEN %s AND %s
+                        GROUP BY patient_uuid
+                        ORDER BY weighted_avg_negative_rate DESC
+                        LIMIT 5
+                    """, ("1144055461247717506", start_date, today))
+                    top5_users = cur.fetchall()
+                    
+                    plt.figure(figsize=(12, 8))
+                    
+                    for i,user in enumerate(top5_users,start=1):
+                        uuid = user["patient_uuid"]
+                        cur.execute("""
+                            SELECT
+                                created_at,
+                                negative_rate
+                            FROM depressed
+                            WHERE patient_uuid = %s AND created_at BETWEEN %s AND %s
+                            ORDER BY created_at ASC;
+                        """, (uuid, start_date, today))
+                        
+                        user_data = cur.fetchall()
+                        dates = [row["created_at"] for row in user_data]
+                        negative_rates = [row["negative_rate"] for row in user_data]
+
+                        # 平均を計算してプロット用リストに格納
+                        if dates:  # データが存在する場合
+                            avg_negative_rate = sum(negative_rates) / len(negative_rates)
+                            plt.axhline(y=avg_negative_rate, color=colors[i-1], linestyle='--', alpha=0.4)
+
+                        member = await ctx.guild.fetch_member(int(uuid))
+                        membername =  member.name if member.nick == None else member.nick
+                        membername = emoji.get_emoji_regexp().sub(u'', membername)
+
+                        plt.plot(dates, negative_rates, color=colors[i-1], marker="o", markersize=8, label=f"{i}位：{member}")
+
+                    date_format = JapaneseDateFormatter('%m月%d日')
+                    plt.gca().xaxis.set_major_formatter(date_format)
+                        
+                    # プロット設定
+                    plt.title(f"近々一週間のランク ～THE 鬱遷移～",fontsize=25)
+                    plt.xlabel("日付",fontsize=20)
+                    plt.ylabel("鬱率",fontsize=20)
+                    plt.legend(title="患者",fontsize=20)
+                    plt.xticks(dates[::1],rotation=45,fontsize=20)
+                    plt.tight_layout()
+
+                    bio = io.BytesIO()
+                    plt.savefig(fname=bio, format="png")
+                    bio.seek(0) 
+                    img_file = discord.File(fp=bio,filename="graph.png")
+                    await ctx.send("``/uturank total``で全期間のランキングを表示",file=img_file)
+                    plt.close()
+
     @commands.command()
     async def utuhelp(self, ctx :discord.ext.commands.Context):
         sendtxt = "```md\n# 【鬱感情測定ツール：使い方】\nAIがあなたの感情を文章から自動認識します！```"
         sendtxt +="```\n/utuhelp\nコマンドの使い方を表示するぞ！ \
         \n\n/uturank\nこのサーバーでの鬱ランキングを表示するぞ！ \
-        \n\n/utuprofile\nあなたの今までの発言の鬱度の平均を表示するぞ！ \
+        \n\n/utuprofile\nあなたの今までの発言の鬱度の平均を表示するぞ！返信先のユーザーも見れるぞ！” \
         \n\n/utusokutei\n返信と一緒に使用すると、返信元の文章の鬱度合いを測定できるぞ！ \
         \n\n/utuserver\nこのサーバー全体の鬱度合いを表示するぞ！```"
         sendtxt += "```\n使用AIモデル：\nkoheiduck/bert-japanese-finetuned-sentiment\
@@ -172,10 +247,60 @@ class DepressedBattle(commands.Cog):
 
                 await ctx.channel.send(sendtxt)
 
+                today = datetime.now().date()
+                start_date = today - timedelta(days=7)
+
+                sql_fetch_weekly_rate = """
+                SELECT
+                    created_at,
+                    SUM(negative_rate * amount) / SUM(amount) AS all_negative_rate,
+                    SUM(positive_rate * amount) / SUM(amount) AS all_positive_rate
+                FROM depressed
+                WHERE patient_uuid <> %s AND created_at BETWEEN %s AND %s
+                GROUP BY created_at
+                ORDER BY created_at ASC;
+                """
+
+                cur.execute(sql_fetch_weekly_rate,("1144055461247717506",start_date,today))
+                server_data = cur.fetchall()
+
+                dates = [row["created_at"] for row in server_data]
+                negative_rates = [row["all_negative_rate"] for row in server_data]
+                positive_rates = [row["all_positive_rate"] for row in server_data]
+
+                plt.plot(dates, negative_rates, marker="o", markersize=8, label=f"鬱")
+                plt.plot(dates, positive_rates, marker="o", markersize=8, label=f"喜")
+
+                date_format = JapaneseDateFormatter('%m月%d日')
+                plt.gca().xaxis.set_major_formatter(date_format)
+                # プロット設定
+                plt.title(f"このサーバーの近々一週間の鬱遷移",fontsize=20)
+                plt.legend(fontsize=20)
+                plt.xlabel("日付",fontsize=15)
+                plt.ylabel("鬱率",fontsize=15)
+                plt.xticks(dates[::1],rotation=45)
+                plt.tight_layout()
+
+                bio = io.BytesIO()
+                plt.savefig(fname=bio, format="png")
+                bio.seek(0) 
+                img_file = discord.File(fp=bio,filename="graph.png")
+                await ctx.channel.send(file=img_file)
+                plt.close()
+
     @commands.command()
     async def utuprofile(self, ctx :discord.ext.commands.Context):
+
         uuid = str(ctx.message.author.id)
-        sql = """
+
+        if ctx.message.reference != None:
+            ref_message = await ctx.message.channel.fetch_message(ctx.message.reference.message_id)
+            if ref_message.author == self.bot:
+                await ctx.send("（あなたがやろうとしていることはわかりますが、ｗ）いや実際ボットのデータもあるからできるんだけど、カスみたいなコード書いたせいで実装が……ｗ")
+                return
+            uuid = str(ref_message.author.id)
+        
+        sql_fetch_total_negative = """
             WITH ranked_rates AS (
                 SELECT 
                     patient_uuid,
@@ -194,14 +319,15 @@ class DepressedBattle(commands.Cog):
                 avg_neutral_rate,
                 rank
             FROM ranked_rates
-            WHERE patient_uuid = %s AND patient_uuid <> %s;
+            WHERE patient_uuid = %s
         """
+
+        sendtxt = "```md\n# 【あなたの総合不幸度順位】\nあなたの今までの発言の不幸度合いは……？```\n"
+
         with psycopg2.connect(user=self.bot.sqluser, password=self.bot.sqlpassword, host="localhost", port="5432", dbname="depressed_battle") as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
-                cur.execute(sql, ("1144055461247717506",uuid,"1144055461247717506"))
+                cur.execute(sql_fetch_total_negative, ("1144055461247717506",uuid,))
                 row = cur.fetchone()
-                
-                sendtxt = "```md\n# 【あなたの総合不幸度順位】\nあなたの今までの発言の不幸度合いは……？```\n"
 
                 member = await ctx.guild.fetch_member(int(uuid))
                 membername =  member.name if member.nick == None else member.nick
@@ -219,7 +345,49 @@ class DepressedBattle(commands.Cog):
                     sendtxt += f"## __{membername}__ （？位）\n"
                     sendtxt += f"**データなし**"
 
-                await ctx.channel.send(sendtxt)
+            sql_fetch_weekly_rate = """
+                SELECT
+                    created_at,
+                    negative_rate,
+                    positive_rate
+                FROM depressed
+                WHERE patient_uuid = %s AND created_at BETWEEN %s AND %s
+                ORDER BY created_at ASC;
+            """
+            with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
+                today = datetime.now().date()
+                start_date = today - timedelta(days=7)
+
+                cur.execute(sql_fetch_weekly_rate, (uuid, start_date, today,))
+                user_data = cur.fetchall()
+
+                dates = [row["created_at"] for row in user_data]
+                negative_rates = [row["negative_rate"] for row in user_data]
+                positive_rates = [row["positive_rate"] for row in user_data]
+
+                plt.plot(dates, negative_rates, marker="o", markersize=8, label=f"鬱")
+                plt.plot(dates, positive_rates, marker="o", markersize=8, label=f"喜")
+
+                date_format = JapaneseDateFormatter('%m月%d日')
+                plt.gca().xaxis.set_major_formatter(date_format)
+
+                member = await ctx.guild.fetch_member(int(uuid))
+                # プロット設定
+                plt.title(f"{member}の近々一週間の鬱遷移",fontsize=20)
+                plt.legend(fontsize=20)
+                plt.xlabel("日付",fontsize=15)
+                plt.ylabel("鬱率",fontsize=15)
+                plt.xticks(dates[::1],rotation=45)
+                plt.tight_layout()
+
+                bio = io.BytesIO()
+                plt.savefig(fname=bio, format="png")
+                bio.seek(0) 
+                img_file = discord.File(fp=bio,filename="graph.png")
+                await ctx.channel.send(file=img_file)
+
+        plt.close()
+        await ctx.channel.send(sendtxt)
 
     def sqlinsert(self, author_id, positive_rate, negative_rate, neutral_rate):
         today = datetime.now().date()
@@ -256,6 +424,24 @@ class DepressedBattle(commands.Cog):
                     """, (author_id, positive_rate, negative_rate, neutral_rate, today, 1))
                 
                 conn.commit()
+
+class JapaneseDateFormatter(mdates.DateFormatter):
+    def __init__(self, date_format):
+        super().__init__(date_format)
+        self.japanese_weekdays = ["月", "火", "水", "木", "金", "土", "日"]
+
+    def __call__(self, x, pos=0):
+        # xを日付オブジェクトに変換
+        date = mdates.num2date(x)
+        
+        # 日付文字列を取得
+        date_str = super().__call__(x, pos)
+        
+        # 曜日を取得
+        weekday_index = date.weekday()  # 0: 月曜日, 6: 日曜日
+        weekday_japanese = self.japanese_weekdays[weekday_index]
+        
+        return f"{date_str}（{weekday_japanese}）"
 
 async def setup(bot):
     await bot.add_cog(DepressedBattle(bot))
