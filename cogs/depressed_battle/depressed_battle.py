@@ -25,7 +25,7 @@ class DepressedBattle(commands.Cog):
         self.tokenizer = BertJapaneseTokenizer.from_pretrained('tohoku-nlp/bert-base-japanese-whole-word-masking')
         self.classifier = pipeline("sentiment-analysis",model=self.model,tokenizer=self.tokenizer)
 
-        self.rank_table = [
+        self.rank_table_sokutei = [
                 ["👑 LEGEND級", 97, "精神科の受診を検討して下さい。"],
                 ["🔱 SS級", 95, "鬱病キングです！　医師の診断を受け、ただちに健常者になりましょう！"],
                 ["🌟 S級", 90, "輝く鬱病の星です！　常人より寿命が30年短くなると思われます！"],
@@ -33,6 +33,17 @@ class DepressedBattle(commands.Cog):
                 ["🌼 B級", 70, "花丸印の鬱です！　まだ命の電話で助かります！"],
                 ["🥀 C級", 60, "軽度の鬱です！　この位の気の落ち込みは病の範疇に含まれません。"],
                 ["🌚 D級", 40, "ファッション鬱です！　鬱病というステータスを得るにはちょうど良いラインかもしれませんねｗ"],
+                ["🥶 E級", 0, "健常者過ぎます！　ある意味、精神異常者と言えるかもしれません……ｗ"],
+            ]
+
+        self.rank_table_profile = [
+                ["👑 LEGEND級", 60, "精神科の受診を検討して下さい。"],
+                ["🔱 SS級", 55, "鬱病キングです！　医師の診断を受け、ただちに健常者になりましょう！"],
+                ["🌟 S級", 50, "輝く鬱病の星です！　常人より寿命が30年短くなると思われます！"],
+                ["⭐ A級", 45, "鬱病の星です！　専門家のカウンセリングが必要でしょう！"],
+                ["🌼 B級", 40, "花丸印の鬱です！　まだ命の電話で助かります！"],
+                ["🥀 C級", 35, "軽度の鬱です！　この位の気の落ち込みは病の範疇に含まれません。"],
+                ["🌚 D級", 30, "ファッション鬱です！　鬱病というステータスを得るにはちょうど良いラインかもしれませんねｗ"],
                 ["🥶 E級", 0, "健常者過ぎます！　ある意味、精神異常者と言えるかもしれません……ｗ"],
             ]
 
@@ -55,7 +66,7 @@ class DepressedBattle(commands.Cog):
         targettxt = targettxt.content
         detected_emotions = self.emotion_detector(targettxt)
 
-        rank_result = self.get_rank(detected_emotions["NEGATIVE"])
+        rank_result = self.get_rank(detected_emotions["NEGATIVE"],False)
 
         sendtext = "```md\n# 【この発言の鬱レベルは……？】\n```\n"
         sendtext += "# ＜ __"+rank_result[0]+"__ ＞\n"
@@ -66,8 +77,9 @@ class DepressedBattle(commands.Cog):
         
         await ctx.channel.send(sendtext)
 
-    def get_rank(self,negative_rate):
-        for rank in self.rank_table:
+    def get_rank(self,negative_rate,profilerank):
+        ranktable = self.rank_table_profile if profilerank else self.rank_table_sokutei
+        for rank in ranktable:
             if rank[1] <= negative_rate:
                 return rank
 
@@ -93,35 +105,36 @@ class DepressedBattle(commands.Cog):
         return result
     
     @commands.command()
-    async def uturank(self, ctx, total=None):
-        with psycopg2.connect(user=self.bot.sqluser, password=self.bot.sqlpassword, host="localhost", port="5432", dbname="depressed_battle") as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute("""
-                SELECT 
-                    patient_uuid,
-                    AVG(positive_rate) AS avg_positive_rate,
-                    AVG(negative_rate) AS avg_negative_rate,
-                    AVG(neutral_rate) AS avg_neutral_rate
-                FROM depressed
-                WHERE patient_uuid <> %s
-                GROUP BY patient_uuid
-                ORDER BY avg_negative_rate DESC
-                LIMIT 5
-            """,("1144055461247717506",))
+    async def uturank(self, ctx, graph="total"):
+        if graph == "total":
+            with psycopg2.connect(user=self.bot.sqluser, password=self.bot.sqlpassword, host="localhost", port="5432", dbname="depressed_battle") as conn:
+                with conn.cursor(cursor_factory=DictCursor) as cur:
+                    cur.execute("""
+                        SELECT 
+                            patient_uuid,
+                            SUM(positive_rate * amount) / SUM(amount) AS weighted_avg_positive_rate,
+                            SUM(negative_rate * amount) / SUM(amount) AS weighted_avg_negative_rate,
+                            SUM(neutral_rate * amount) / SUM(amount) AS weighted_avg_neutral_rate
+                        FROM depressed
+                        WHERE patient_uuid <> %s
+                        GROUP BY patient_uuid
+                        ORDER BY weighted_avg_negative_rate DESC
+                        LIMIT 5
+                    """, ("1144055461247717506",))
 
-                rows = cur.fetchall()
-                
-                sendtxt = "```md\n# 【不幸度総合ランキング】\nこのサーバーで最も不幸なのは……！？```\n"
-                
-                for i, row in enumerate(rows):
+                    rows = cur.fetchall()
+                    
+                    sendtxt = "```md\n# 【不幸度総合ランキング】\nこのサーバーで最も不幸なのは……！？```\n"
+                    
+                    for i, row in enumerate(rows):
 
-                    member = await ctx.guild.fetch_member(row["patient_uuid"])
-                    membername =  member.name if member.nick == None else member.nick
+                        member = await ctx.guild.fetch_member(row["patient_uuid"])
+                        membername =  member.name if member.nick == None else member.nick
 
-                    sendtxt += f"## __{i+1}位.  {membername}__  (鬱度：{round(row['avg_negative_rate'],2)}%)\n"
-                    sendtxt += f"**＜ {self.get_rank(row['avg_negative_rate'])[0]} ＞**\n"
-                
-                await ctx.channel.send(sendtxt)
+                        sendtxt += f"## __{i+1}位.  {membername}__  (鬱度：{round(row['weighted_avg_negative_rate'],2)}%)\n"
+                        sendtxt += f"**＜ {self.get_rank(row['weighted_avg_negative_rate'],True)[0]} ＞**\n"
+                    
+                    await ctx.channel.send(sendtxt)
 
     @commands.command()
     async def utuhelp(self, ctx :discord.ext.commands.Context):
@@ -141,10 +154,10 @@ class DepressedBattle(commands.Cog):
         with psycopg2.connect(user=self.bot.sqluser, password=self.bot.sqlpassword, host="localhost", port="5432", dbname="depressed_battle") as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
                 cur.execute("""
-                    SELECT 
-                        AVG(positive_rate) AS avg_positive_rate,
-                        AVG(negative_rate) AS avg_negative_rate,
-                        AVG(neutral_rate) AS avg_neutral_rate
+                    SELECT
+                        SUM(positive_rate * amount) / SUM(amount) AS avg_positive_rate,
+                        SUM(negative_rate * amount) / SUM(amount) AS avg_negative_rate,
+                        SUM(neutral_rate * amount) / SUM(amount) AS avg_neutral_rate
                     FROM depressed
                     WHERE patient_uuid <> %s;
                 """,("1144055461247717506",))
@@ -152,9 +165,9 @@ class DepressedBattle(commands.Cog):
                 row = cur.fetchone()
                 
                 sendtxt = f"```md\n# 【このサーバーの平均精神健康度は……】\n```\n"
-                sendtxt += f"# :skull:鬱度：{round(row['avg_positive_rate'],2)}%\n"
+                sendtxt += f"# :skull:鬱度：{round(row['avg_negative_rate'],2)}%\n"
                 sendtxt += f":heart:幸福度：{round(row['avg_positive_rate'],2)}%\n"
-                sendtxt += f":neutral_face:普通度：{round(row['avg_positive_rate'],2)}%\n\n"
+                sendtxt += f":neutral_face:普通度：{round(row['avg_neutral_rate'],2)}%\n\n"
                 sendtxt += f"```\nです！```\n"
 
                 await ctx.channel.send(sendtxt)
@@ -166,10 +179,10 @@ class DepressedBattle(commands.Cog):
             WITH ranked_rates AS (
                 SELECT 
                     patient_uuid,
-                    AVG(positive_rate) AS avg_positive_rate,
-                    AVG(negative_rate) AS avg_negative_rate,
-                    AVG(neutral_rate) AS avg_neutral_rate,
-                    RANK() OVER (ORDER BY AVG(positive_rate) DESC) AS rank
+                    SUM(positive_rate * amount) / SUM(amount) AS avg_positive_rate,
+                    SUM(negative_rate * amount) / SUM(amount) AS avg_negative_rate,
+                    SUM(neutral_rate * amount) / SUM(amount) AS avg_neutral_rate,
+                    RANK() OVER (ORDER BY (SUM(negative_rate * amount) / SUM(amount)) DESC) AS rank
                 FROM depressed
                 WHERE patient_uuid <> %s
                 GROUP BY patient_uuid
@@ -190,12 +203,11 @@ class DepressedBattle(commands.Cog):
                 
                 sendtxt = "```md\n# 【あなたの総合不幸度順位】\nあなたの今までの発言の不幸度合いは……？```\n"
 
-                member = await ctx.guild.fetch_member(row["patient_uuid"])
+                member = await ctx.guild.fetch_member(int(uuid))
                 membername =  member.name if member.nick == None else member.nick
 
-                rank_degree = self.get_rank(row['avg_negative_rate'])
-
                 if row:
+                    rank_degree = self.get_rank(row['avg_negative_rate'],True)
                     sendtxt += f"## ・__{membername}__ （{row['rank']}位）\n"
                     sendtxt += f"**💀鬱度：{round(row['avg_negative_rate'],2)}%**\n"
                     sendtxt += f"❤️幸福度：{round(row['avg_positive_rate'],2)}%\n"
