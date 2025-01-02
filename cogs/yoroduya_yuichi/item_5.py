@@ -16,20 +16,69 @@ async def use_item(bot, ctx):
     await asyncio.sleep(1) 
     
     dice = random.randint(0,9999)
-    result = dedent(f"""
-            # :game_die: {dice}
-            # __チャレンジ失敗！__
-    """)
+    result = ""
 
-    if target == dice:
-        amount = bot.economysystem.get_balance(str(216478397570744320))
-        bot.economysystem.withdraw(str(216478397570744320), amount)
-        bot.economysystem.deposit(str(ctx.author.id), amount)
+    amount = bot.economysystem.get_balance(str(216478397570744320))
+
+    if abs(target-dice)==0:
+        gatya_transfer(ctx,bot,amount)
 
         result = dedent(f"""
             # :game_die: {dice}
-            # __チャレンジ成功！！！__
-            # {amount} ADP獲得！
+            # __！！！！！！チャレンジ成功！！！！！！__
         """)
+    elif abs(target-dice)<1:
+        amount //= 300
+        gatya_transfer(ctx,bot,amount)
 
+        result = dedent(f"""
+            # :game_die: {dice}
+            # __プラマイ1 超超超ニアミス！！！__
+        """)
+    elif abs(target-dice)<10:
+        amount //= 700
+        gatya_transfer(ctx,bot,amount)
+
+        result = dedent(f"""
+            # :game_die: {dice}
+            # __プラマイ10 超ニアミス！！！__
+        """)
+    elif abs(target-dice)<100:
+        amount //= 4000
+        gatya_transfer(ctx,bot,amount)
+
+        result = dedent(f"""
+            # :game_die: {dice}
+            # __プラマイ１００！！！__
+        """)
+    elif abs(target-dice)<1000:
+        amount //= 9000
+        gatya_transfer(ctx,bot,amount)
+
+        result = dedent(f"""
+            # :game_die: {dice}
+            # __プラマイ１０００ 健闘賞！！！__
+        """)
+    elif abs(target-dice)<3000:
+        a = [1,10,50,100,500]
+        amount = random.choice(a)
+        gatya_transfer(ctx, bot, amount)
+
+        result = dedent(f"""
+            # :game_die: {dice}
+            # __プラマイ３０００ 自販機の下の小銭あげますで賞！！！__
+        """)
+    else:
+        result = dedent(f"""
+            # :game_die: {dice}
+            # __チャレンジ失敗！__
+        """)
+        await ctx.send(result)
+        return
+
+    result += f"# {ctx.author.mention} : {amount} ADP獲得！"
     await ctx.send(result)
+
+def gatya_transfer(ctx, bot,amount):
+    bot.economysystem.withdraw(str(216478397570744320), amount)
+    bot.economysystem.deposit(str(ctx.author.id), amount)

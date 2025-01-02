@@ -73,7 +73,7 @@ class YORODUYA_U1(commands.Cog):
             msg = self.shopsystem.purchase(str(ctx.author.id), item_id, amount)
             await ctx.send(msg)
         except ValueError as e:
-            await ctx.send(f"エラー: {e}")
+            await ctx.send(f"{e}")
 
     @u1shop.command()
     async def use(self, ctx, item_id : int):
@@ -81,7 +81,7 @@ class YORODUYA_U1(commands.Cog):
             used_item = self.shopsystem.consume_item(str(ctx.author.id), item_id)
             await self.item_use(used_item, ctx)
         except ValueError as e:
-            await ctx.send(f"エラー: {e}")
+            await ctx.send(f"{e}")
 
     async def item_use(self, used_item, ctx):
         await self.ITEM_HANDLERS[used_item](self.bot, ctx)

@@ -58,7 +58,7 @@ class ShopSystem:
                 """, (uuid, item_id))
                 inventory_item = cur.fetchone()
                 if not inventory_item or inventory_item[0] <= 0:
-                    raise ValueError("インベントリに指定された商品がありません。")
+                    raise ValueError("そのアイテムを所持していません！")
 
                 # 在庫を更新
                 cur.execute("""
