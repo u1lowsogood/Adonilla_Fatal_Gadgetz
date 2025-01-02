@@ -1,12 +1,13 @@
+
 from textwrap import dedent
 
 async def use_item(bot, ctx):
     msg = dedent(f"""
-        親愛なる <@216478397570744320> 様へ―――。
-
+        ウッス！ <@216478397570744320> クン！ｗ。
+    
         {ctx.author.mention} が
-        # __「ゆういちが貴方に絵を描く権利」__
+        # __「ゆういちが貴方のことを浅く意識する権利」__
         を使用しました！
-        彼の神技を、その目でご照覧あれ―――！
+        オイ！俺のこと考えろ！ｗ
     """)
     await ctx.send(msg)

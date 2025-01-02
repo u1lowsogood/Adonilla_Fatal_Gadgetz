@@ -3,7 +3,7 @@ import psycopg2
 from psycopg2.extras import DictCursor
 from textwrap import dedent
 
-from cogs.yoroduya_yuichi import item_1, item_2
+from cogs.yoroduya_yuichi import item_1, item_2, item_3,item_4,item_5
 
 class YORODUYA_U1(commands.Cog):
     def __init__(self, bot):
@@ -15,6 +15,9 @@ class YORODUYA_U1(commands.Cog):
         self.ITEM_HANDLERS = {
             1: item_1.use_item,
             2: item_2.use_item,
+            3: item_3.use_item,
+            4: item_4.use_item,
+            5: item_5.use_item,
         }
 
         self.usage = dedent("""
@@ -53,11 +56,11 @@ class YORODUYA_U1(commands.Cog):
         msg += "```md\n"
 
         items = self.shopsystem.get_shop_items(self.shop_id)
-        for i, item in enumerate(items, start=1):
+        for item in items:
             msg += dedent(f"""
-                {i}. 『{item[0]}』
-                {item[1]}
-                > {item[2]} ADP
+                {item[0]}. 『{item[1]}』
+                {item[2]}
+                > {item[3]} ADP
             """)
         msg += "```"
         msg += self.usage

@@ -73,13 +73,14 @@ class ShopSystem:
         with self._connect() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
                 cur.execute("""
-                    SELECT items.name, items.description, items.price
+                    SELECT items.id, items.name, items.description, items.price
                     FROM items
                     JOIN shops ON items.shop_id = shops.id
                     WHERE shops.id = %s
+                    ORDER BY items.id ASC
                 """, (shop_id,))
                 items = cur.fetchall()
-                return [(row['name'], row['description'], row['price']) for row in items]
+                return [(row['id'], row['name'], row['description'], row['price']) for row in items]
 
     def get_inventory_items(self, uuid, shop_id):
         with self._connect() as conn:
@@ -90,6 +91,7 @@ class ShopSystem:
                     JOIN items ON items.id = inventory.item_id
                     JOIN shops ON items.shop_id = shops.id
                     WHERE inventory.user_uuid = %s AND shops.id = %s
+                    ORDER BY items.id ASC
                 """, (uuid, shop_id,))
                 items = cur.fetchall()
                 return [(row['id'], row['name'], row['description'], row['amount']) for row in items]
