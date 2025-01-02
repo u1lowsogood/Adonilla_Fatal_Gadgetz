@@ -5,6 +5,7 @@ from typing import Any, Coroutine, Optional
 import discord
 from discord.ext import tasks, commands
 import sys
+from cogs.adonilla_eco_system.economysystem import EconomySystem
 
 args = sys.argv
 if len(args) != 4:
@@ -25,6 +26,7 @@ class afgBot(commands.Bot):
         super().__init__(command_prefix="/",intents=intents)
         self._sqluser = args[2]
         self._sqlpassword = args[3]
+        self._economysystem = EconomySystem(args[2], args[3])
     
     @property
     def sqluser(self):
@@ -34,6 +36,9 @@ class afgBot(commands.Bot):
     def sqlpassword(self):
         return self._sqlpassword
     
+    @property
+    def economysystem(self):
+        return self._economysystem
         
 bot = afgBot()
 
@@ -74,8 +79,9 @@ cogz = [
     "cogs.kintamaoukoku.kintamaoukoku",
     "cogs.curse.curse",
     "cogs.todorate.todorate",
+    "cogs.convertfxtwitter.convertfxtwitter",
+    "cogs.adonilla_eco_system.eco",
     "cogs.depressed_battle.depressed_battle",
-    "cogs.convertfxtwitter.convertfxtwitter"
     ]
 
 #畳【み【して ) み【た！【み！

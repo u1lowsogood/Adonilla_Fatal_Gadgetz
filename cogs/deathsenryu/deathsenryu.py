@@ -76,7 +76,7 @@ class IkkuReadingModal(discord.ui.Modal,title="川柳を詠む"):
         """
     
         try:
-            with psycopg2.connect(user=self.bot.sqluser, password=self.bot.sqlpassword,host="localhost", port="5432", dbname="deathsenryu") as conn:
+            with psycopg2.connect(user=self.bot.sqluser, password=self.bot.sqlpassword, host="localhost", port="5432", dbname="deathsenryu") as conn:
                 with conn.cursor() as cur:
                     cur.execute(sql, (self.replyto.author.id, senryu))
                     #print(f"sql inserted: {senryu}")
