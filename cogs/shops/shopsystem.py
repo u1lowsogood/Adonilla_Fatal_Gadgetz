@@ -43,11 +43,10 @@ class ShopSystem:
                 cur.execute("""
                     INSERT INTO inventory (user_uuid, item_id, amount)
                     VALUES (%s, %s, %s)
-                    ON CONFLICT (item_id)
+                    ON CONFLICT (user_uuid, item_id)
                     DO UPDATE SET amount = inventory.amount + EXCLUDED.amount
-                """, (uuid, item_id, amount,))
+                """, (uuid, item_id, amount))
                 
-                # コミットして変更を確定
                 conn.commit()
 
     def consume_item(self, uuid, item_id):

@@ -3,7 +3,7 @@ import psycopg2
 from psycopg2.extras import DictCursor
 from textwrap import dedent
 
-from cogs.yoroduya_yuichi import item_1
+from cogs.yoroduya_yuichi import item_1, item_2
 
 class YORODUYA_U1(commands.Cog):
     def __init__(self, bot):
@@ -14,19 +14,18 @@ class YORODUYA_U1(commands.Cog):
 
         self.ITEM_HANDLERS = {
             1: item_1.use_item,
+            2: item_2.use_item,
         }
 
         self.usage = dedent("""
             ```md
             # 【用法】
-            商品一覧：
-            /u1shop
             購入方法：
-            /u1shop buy 商品番号
-            購入した物品一覧を確認：
-            /u1shop inventory
+            /u1shop buy アイテム番号
             使用方法：
             /u1shop use アイテム番号
+            インベントリ：
+            /u1shop inventory
             ```
         """)
 
@@ -102,6 +101,6 @@ class YORODUYA_U1(commands.Cog):
             ```
         """)
         await ctx.send(sendmsg)
-        
+
 async def setup(bot):
     await bot.add_cog(YORODUYA_U1(bot))

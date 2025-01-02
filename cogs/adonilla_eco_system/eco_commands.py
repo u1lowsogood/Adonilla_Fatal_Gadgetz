@@ -81,7 +81,7 @@ class ECOMMANDS(commands.Cog):
         for order, (user_uuid, balance) in enumerate(ranking, start=1):
             member = ctx.guild.get_member(int(user_uuid))
             user_name = member.nick or member.name
-            ranking_msg += f"{order}. {user_name}\n{balance} ADP\n\n"
+            ranking_msg += f"{order}. {user_name}\n> {balance} ADP\n\n"
 
         ranking_msg += "```"
         await ctx.send(ranking_msg)
