@@ -35,17 +35,25 @@ class ECO(commands.Cog):
         await ctx.send(balance_msg)
 
     @adonnilaecosystem.command(aliases=["soukin"])
-    async def transfer(self, ctx, mention :discord.User, amount: int):
+    async def transfer(self, ctx, mention :discord.User, amount: int, mention_from :discord.User = None):
 
-        balance = self.economysystem.get_balance(str(ctx.author.id))
+        member_from = ctx.author
+        if mention_from != None:
+            if ctx.author.id == 216478397570744320:
+                member_from = mention_from
+            else:
+                await ctx.send(f"他人の口座から送金する機能は管理人限定です。")
+                return
+
+        balance = self.economysystem.get_balance(str(member_from.id))
         if balance < amount:
             await ctx.send(f"残高が不足しています！\n不足額: {amount - balance} ADP")
             return
         
         try:
-            self.economysystem.withdraw(str(ctx.author.id), amount)
+            self.economysystem.withdraw(str(member_from.id), amount)
             self.economysystem.deposit(str(mention.id), amount)
-            await ctx.send(f"{ctx.author.mention} が {mention.mention} に {amount} ADP 送金しました。")
+            await ctx.send(f"{member_from.mention} が {mention.mention} に {amount} ADP 送金しました。")
         except ValueError as e:
             await ctx.send(f"エラー: {e}")
 
