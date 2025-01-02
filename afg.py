@@ -74,7 +74,8 @@ cogz = [
     "cogs.kintamaoukoku.kintamaoukoku",
     "cogs.curse.curse",
     "cogs.todorate.todorate",
-    "cogs.depressed_battle.depressed_battle"
+    "cogs.depressed_battle.depressed_battle",
+    "cogs.convertfxtwitter.convertfxtwitter"
     ]
 
 #畳【み【して ) み【た！【み！
