@@ -1,7 +1,7 @@
 from discord.ext import commands
 import discord
 
-class ECO(commands.Cog):
+class ECOMMANDS(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.economysystem = self.bot.economysystem
@@ -19,6 +19,8 @@ class ECO(commands.Cog):
 送金
 /aeco ranking
 長者番付
+/shops
+アドンイラエコシステムで使用可能なコンテンツ一覧を表示します。
 ```
 """
         await ctx.send(help)
@@ -86,4 +88,4 @@ class ECO(commands.Cog):
 
 
 async def setup(bot):
-    await bot.add_cog(ECO(bot))
+    await bot.add_cog(ECOMMANDS(bot))
