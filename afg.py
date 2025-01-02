@@ -80,7 +80,8 @@ cogz = [
     "cogs.curse.curse",
     "cogs.todorate.todorate",
     "cogs.convertfxtwitter.convertfxtwitter",
-    "cogs.adonilla_eco_system.eco",
+    "cogs.adonilla_eco_system.eco_commands",
+    "cogs.shops.shops",
     "cogs.depressed_battle.depressed_battle",
     ]
 
