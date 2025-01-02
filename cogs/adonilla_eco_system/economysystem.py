@@ -31,13 +31,11 @@ class EconomySystem:
         self._ensure_account_exists(user_uuid)
         with self._connect() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
-                # Get current balance
                 cur.execute("SELECT balance FROM accounts WHERE user_uuid = %s", (user_uuid,))
                 result = cur.fetchone()
 
                 new_balance = result['balance'] + amount
 
-                # Update balance
                 cur.execute(
                     "UPDATE accounts SET balance = %s WHERE user_uuid = %s",
                     (new_balance, user_uuid)
@@ -49,17 +47,24 @@ class EconomySystem:
         self._ensure_account_exists(user_uuid)
         with self._connect() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
-                # Get current balance
+
                 cur.execute("SELECT balance FROM accounts WHERE user_uuid = %s", (user_uuid,))
                 result = cur.fetchone()
 
                 new_balance = result['balance'] - amount
                 if new_balance < 0:
                     raise ValueError("残金なし")
-
-                # Update balance
+                
                 cur.execute(
                     "UPDATE accounts SET balance = %s WHERE user_uuid = %s",
                     (new_balance, user_uuid)
                 )
                 conn.commit()
+
+    def get_ranking(self):
+        with self._connect() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute("SELECT user_uuid, balance FROM accounts ORDER BY balance DESC LIMIT 5")
+                result = cur.fetchall()
+                members_list = [(row['user_uuid'], row['balance']) for row in result]
+                return members_list
