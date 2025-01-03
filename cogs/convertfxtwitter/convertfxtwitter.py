@@ -13,28 +13,45 @@ class Convert2Fxtwitter(commands.Cog):
             return
 
         twitter_url_pattern = r"https?://(?:www\.)?(x|twitter)\.com/(\w+)/status/(\d+)"
-        matches = re.finditer(twitter_url_pattern, msg.content)
+        matches = list(re.finditer(twitter_url_pattern, msg.content))
 
-        updated_content = msg.content
-        for match in matches:
-            username = match.group(2)
-            status_id = match.group(3)
-            fx_twitter_url = f"https://fxtwitter.com/{username}/status/{status_id}"
-            updated_content = updated_content.replace(match.group(0), fx_twitter_url)
+        if not matches:
+            return
 
-            if "||" in msg.content:
-                parts = re.split(r"(\|\|.*?\|\|)", msg.content)
-                reconstructed = ""
-                for part in parts:
-                    if part.startswith("||") and part.endswith("||"):
-                        reconstructed += f"||{updated_content[len(reconstructed):len(reconstructed) + len(part.strip('||'))]}||"
-                    else:
-                        reconstructed += updated_content[len(reconstructed):len(reconstructed) + len(part)]
-                updated_content = reconstructed
+        if "||" in msg.content:
+            parts = re.split(r"(\|\|.*?\|\|)", msg.content)
+            reconstructed = ""
+            for part in parts:
+                if part.startswith("||") and part.endswith("||"):
+                    inner_matches = re.finditer(twitter_url_pattern, part)
+                    updated_part = part
+                    for match in inner_matches:
+                        username = match.group(2)
+                        status_id = match.group(3)
+                        fx_twitter_url = f"https://fxtwitter.com/{username}/status/{status_id}"
+                        updated_part = updated_part.replace(match.group(0), fx_twitter_url)
+                    reconstructed += updated_part
+                else:
+                    updated_part = part
+                    for match in matches:
+                        username = match.group(2)
+                        status_id = match.group(3)
+                        fx_twitter_url = f"https://fxtwitter.com/{username}/status/{status_id}"
+                        updated_part = updated_part.replace(match.group(0), fx_twitter_url)
+                    reconstructed += updated_part
+            updated_content = reconstructed
+        else:
+
+            updated_content = msg.content
+            for match in matches:
+                username = match.group(2)
+                status_id = match.group(3)
+                fx_twitter_url = f"https://fxtwitter.com/{username}/status/{status_id}"
+                updated_content = updated_content.replace(match.group(0), fx_twitter_url)
 
         await msg.delete()
-        await msg.channel.send(f"> from {msg.author.nick or msg.author.name}")
 
+        await msg.channel.send(f"> from {msg.author.nick or msg.author.name}")
         if msg.reference:
             ref_msg = await msg.channel.fetch_message(msg.reference.message_id)
             await ref_msg.reply(updated_content)
