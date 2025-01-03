@@ -89,6 +89,7 @@ cogz = [
     "cogs.adonilla_eco_system.eco_commands",
     "cogs.shops.shops",
     "cogs.yoroduya_yuichi.yoroduya_yuichi",
+    "cogs.daily_bonus.daily_bonus",
     #"cogs.depressed_battle.depressed_battle",
     ]
 
