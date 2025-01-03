@@ -6,6 +6,7 @@ import discord
 from discord.ext import tasks, commands
 import sys
 from cogs.adonilla_eco_system.economysystem import EconomySystem
+from cogs.shops.shopsystem import ShopSystem
 
 args = sys.argv
 if len(args) != 4:
@@ -27,6 +28,7 @@ class afgBot(commands.Bot):
         self._sqluser = args[2]
         self._sqlpassword = args[3]
         self._economysystem = EconomySystem(args[2], args[3])
+        self._shopsystem = ShopSystem(args[2], args[3], self.economysystem)
     
     @property
     def sqluser(self):
@@ -39,7 +41,11 @@ class afgBot(commands.Bot):
     @property
     def economysystem(self):
         return self._economysystem
-        
+    
+    @property
+    def shopsystem(self):
+        return self._shopsystem
+    
 bot = afgBot()
 
 #上から読み込まれるからデバッグしたい新規機能は上から追加したほうがいいかも？
@@ -82,7 +88,9 @@ cogz = [
     "cogs.convertfxtwitter.convertfxtwitter",
     "cogs.adonilla_eco_system.eco_commands",
     "cogs.shops.shops",
-    "cogs.depressed_battle.depressed_battle",
+    "cogs.yoroduya_yuichi.yoroduya_yuichi",
+    "cogs.daily_bonus.daily_bonus",
+    #"cogs.depressed_battle.depressed_battle",
     ]
 
 #畳【み【して ) み【た！【み！
