@@ -34,8 +34,8 @@ class ShopSystem:
 
                 self.economysystem.withdraw(uuid, total_price)
 
-                kokko_uuid = self.bot.economysystem.get_kokko_uuid()
-                self.bot.economysystem.deposit(kokko_uuid, total_price)
+                kokko_uuid = self.economysystem.get_kokko_uuid()
+                self.economysystem.deposit(kokko_uuid, total_price)
 
                 self.add_item(uuid, item_id, amount)
 
