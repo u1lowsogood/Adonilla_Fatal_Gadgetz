@@ -68,3 +68,9 @@ class EconomySystem:
                 result = cur.fetchall()
                 members_list = [(row['user_uuid'], row['balance']) for row in result]
                 return members_list
+    
+    def get_kokko_uuid(self):
+        with self._connect() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT user_uuid, balance FROM accounts ORDER BY balance DESC LIMIT 1")
+                return cur.fetchone()[0]
