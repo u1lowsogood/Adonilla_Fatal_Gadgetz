@@ -11,7 +11,7 @@ class DAILY(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.economysystem = self.bot.economysystem
-        self.between_hour = 8
+        self.between_hour = 6
 
     def _connect(self):
         return psycopg2.connect(user=self.bot.sqluser, password=self.bot.sqlpassword, host="localhost", port="5432", dbname="adonilla_economy_system")
@@ -23,8 +23,8 @@ class DAILY(commands.Cog):
 
         if eligible:
             dice = [1,2,3,4,5,6]
-            target = random.choices(dice,weights=[1,2,3,3,3,1],k=1)[0]
-            multiply = 250
+            target = random.choices(dice,weights=[1,1,1,1,1,1],k=1)[0]
+            multiply = 350
             amount = target*multiply
             msg = dedent(f"""
                 # __デイリーADP！__

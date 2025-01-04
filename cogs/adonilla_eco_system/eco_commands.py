@@ -36,7 +36,7 @@ class ECOMMANDS(commands.Cog):
 """
         await ctx.send(balance_msg)
 
-    @adonnilaecosystem.command(aliases=["soukin"])
+    @adonnilaecosystem.command(aliases=["soukin","t"])
     async def transfer(self, ctx, mention :discord.User, amount: int, mention_from :discord.User = None):
 
         member_from = ctx.author
@@ -75,13 +75,13 @@ class ECOMMANDS(commands.Cog):
 
     @adonnilaecosystem.command(aliases=["banduke","banzuke"])
     async def ranking(self, ctx):
-        ranking = self.economysystem.get_ranking()
+        ranking = self.economysystem.get_ranking(10)
         ranking_msg = "```md\n# 【アドンイラ長者番付】\n\n"
 
         for order, (user_uuid, balance) in enumerate(ranking, start=1):
             member = ctx.guild.get_member(int(user_uuid))
             user_name = member.nick or member.name
-            ranking_msg += f"{order}. {user_name}\n> {balance} ADP\n\n"
+            ranking_msg += f"{order}. {user_name}\n> {balance} ADP\n"
 
         ranking_msg += "```"
         await ctx.send(ranking_msg)

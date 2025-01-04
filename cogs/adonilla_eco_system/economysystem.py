@@ -61,10 +61,10 @@ class EconomySystem:
                 )
                 conn.commit()
 
-    def get_ranking(self):
+    def get_ranking(self,limit=5):
         with self._connect() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
-                cur.execute("SELECT user_uuid, balance FROM accounts ORDER BY balance DESC LIMIT 5")
+                cur.execute("SELECT user_uuid, balance FROM accounts ORDER BY balance DESC LIMIT %s",(limit,))
                 result = cur.fetchall()
                 members_list = [(row['user_uuid'], row['balance']) for row in result]
                 return members_list

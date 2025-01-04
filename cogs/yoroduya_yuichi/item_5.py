@@ -6,7 +6,7 @@ import inspect
 async def use_item(bot, ctx):
 
     target = random.randint(0, 9999)
-    await ctx.send(dedent(f"""
+    await ctx.reply(dedent(f"""
         {ctx.author.mention} が１万分の１の確率で全財産チャレンジ！
         サイコロで **__ {target} __** の目が出たらチャレンジ成功！
     """))
@@ -24,11 +24,11 @@ async def use_item(bot, ctx):
 
     conditions = [
         (0, lambda: u1_balance, "__！！！！！！チャレンジ成功全財産略奪！！！！！！__"),
-        (1, lambda: u1_balance // 300, "__プラマイ1 超超超ニアミス！！！__"),
-        (10, lambda: u1_balance // 700, "__プラマイ10 超ニアミス！！！__"),
-        (100, lambda: u1_balance // 2000, "__プラマイ１００！！！__"),
-        (500, lambda: combo_bonus(ctx), "__プラマイ５００！ JACKPOT！！__"),
-        (1000, lambda: u1_balance // 9000, "__プラマイ１０００ 健闘賞！！！__"),
+        (1, lambda: u1_balance // 50, "__プラマイ1 超超超ニアミス:moneybag: ！！！__"),
+        (10, lambda: u1_balance // 300, "__:moneybag: プラマイ10 超ニアミス:moneybag: ！！！__"),
+        (100, lambda: u1_balance // 1000, "__:moneybag: プラマイ１００！！！:moneybag: __"),
+        (500, lambda: combo_bonus(ctx), "__:moneybag: ジャックポット終了:moneybag: ！__"),
+        (1000, lambda: u1_balance // 9000, "__:moneybag:プラマイ１０００ 健闘賞！！！:moneybag:__"),
         (3000, lambda: random.choice([1, 10, 50, 100, 500]), "__プラマイ３０００ 自販機の下の小銭あげますで賞！！！__"),
     ]
 
@@ -42,7 +42,7 @@ async def use_item(bot, ctx):
     else:
         result += f"\n# {ctx.author.mention} : {amount} ADP獲得！"
 
-    await ctx.send(result)
+    await ctx.reply(result)
 
 async def evaluate_conditions(player_uuid, bot, conditions, diff, dice):
     for threshold, action, message in conditions:
@@ -61,13 +61,30 @@ async def evaluate_conditions(player_uuid, bot, conditions, diff, dice):
     return None, 0
 
 async def combo_bonus(ctx):
-    bonus = 500
+    bonus_steps = [
+        (3, 100, ["", ""]),
+        (6, 300, ["**", "**"]),
+        (9, 600, ["__**", "**__"]),
+        (12, 1200, ["## __", "__"]),
+        (15, 5000, ["# __*MAX COMBO！！！", "*__"]),
+    ]
+    bonus_iterator = iter(bonus_steps)
+    current_range, current_bonus, decorator = next(bonus_iterator)
+
     total_bonus = 0
-    combo_count = random.randint(3, 13)
+    combo_count = random.randint(4, 13)
+
+    await ctx.reply("# !!:moneybag: プラマイ５００JACKPOT :moneybag: スタート!!\nhttps://media1.tenor.com/m/0YSqS0ixtm4AAAAd/pon.gif")
+
     for i in range(combo_count):
-        total_bonus += bonus
-        await ctx.send(f"{i + 1} COMBO! {ctx.author.mention} +{bonus} ADP")
+        if i + 1 > current_range:
+            current_range, current_bonus, decorator = next(bonus_iterator)
+
+        combomsg = f"{decorator[0]}{ctx.author.mention} {i + 1} COMBO! :moneybag:+{current_bonus} ADP{decorator[1]}"
+        await ctx.send(combomsg)
         await asyncio.sleep(1)
+        total_bonus += current_bonus
+
     return total_bonus
 
 def gatya_transfer(player_uuid, bot, amount):

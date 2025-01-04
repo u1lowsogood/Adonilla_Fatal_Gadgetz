@@ -13,10 +13,11 @@ class ShowedSenryuRemoveView(discord.ui.View):
         await interaction.message.delete()
 
 class IkkuReadingModal(discord.ui.Modal,title="川柳を詠む"):
-    def __init__(self,replyto,bot):
+    def __init__(self,replyto,bot, is_randomly=False):
         super().__init__(timeout=None)
         self.replyto: discord.Message = replyto
         self.bot = bot
+        self.is_randomly = is_randomly
 
     senryu = discord.ui.TextInput(
         label='スペース区切りで一句！',
@@ -64,6 +65,16 @@ class IkkuReadingModal(discord.ui.Modal,title="川柳を詠む"):
         evaluation = await self.replyto.reply(content)
         await evaluation.add_reaction("👍")
 
+        if self.is_randomly:
+            table = [
+                ("世界大会優勝！",3000),
+                ("優秀賞！",1000),
+                ("頑張ったで賞！",500),
+            ]
+            award = random.choices(table,weights=[1,2,1],k=1)[0]
+            self.bot.economysystem.deposit(str(interaction.user.id),award[1])
+            await self.replyto.reply(f"見事『{award[0]}』を勝ち取りました！\n{award[1]}ADP 獲得！")
+
     def sqlinsert(self,senryu):
         sql = """
             insert into deathsenryu(
@@ -95,7 +106,7 @@ class KokodeIkkuView(discord.ui.View):
         if interaction.user.id != self.replyto.author.id:
             await interaction.response.send_message("他人の川柳を勝手に詠めないよ\n/deathsenryu コマンドで一句読めるよ")
             return
-        inputmodal = IkkuReadingModal(self.replyto,self.bot)
+        inputmodal = IkkuReadingModal(self.replyto,self.bot,True)
         await interaction.response.send_modal(inputmodal)
         await interaction.message.delete()
 
