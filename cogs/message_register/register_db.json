@@ -207,5 +207,8 @@
   "prompt": "```ffmpeg -i input.mp4 -vf \"palettegen\" -y palette.png && ffmpeg -i input.mp4 -i palette.png -lavfi \"fps=12,scale=900:-1:flags=lanczos [x]; [x][1:v] paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle\" -y output.gif```",
   "福山雅治": "https://cdn.discordapp.com/attachments/364043474414075906/1319469330785763348/image.png?ex=67661313&is=6764c193&hm=399ec113c02e65064aaf9cc921b1415cfc6b063df2d41ac6381195d6dae93969&\n",
   "起床": "https://cdn.discordapp.com/attachments/366193178568818688/1320131533889077369/bafkreia4iloegwpttoyok4n7umnumkecx3leqzljtsdqufq7fi26m4srmejpeg.png?ex=67687bcc&is=67672a4c&hm=1af2ebc989d4f4b39f567c9f57d80854ddee57c06830c2b55beb3438853ac1c1&\n",
-  "どす": "はあ"
+  "どす": "はあ",
+  "/rm": "https://cdn.discordapp.com/attachments/669564702128603136/1325135427618734110/image.png?ex=677ab009&is=67795e89&hm=7a24cfde1ca4693b73389cfd4b0c994d558ed81237d1849be325b67b2e4ff9b7&\n",
+  "ゆういち": "https://cdn.discordapp.com/attachments/669564702128603136/1325135427618734110/image.png?ex=677ab009&is=67795e89&hm=7a24cfde1ca4693b73389cfd4b0c994d558ed81237d1849be325b67b2e4ff9b7&\n",
+  "あけましておめでとう": "https://cdn.discordapp.com/attachments/1325051212323754006/1325135823703769098/image.png?ex=677ab068&is=67795ee8&hm=30136c91a5929b25f77e9ef503e3afd7991f245d64f1718e21a587004afba3c3&\n"
 }

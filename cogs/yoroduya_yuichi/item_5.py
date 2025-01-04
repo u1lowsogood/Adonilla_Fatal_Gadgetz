@@ -109,5 +109,9 @@ def get_premium_multiplier(bot,player):
     return 1.0 + (lv_sum / max_lv) * 0.5
 
 def gatya_transfer(kokko_uuid, player_uuid, bot, amount):
-    bot.economysystem.withdraw(kokko_uuid, amount)
-    bot.economysystem.deposit(player_uuid, amount)
+    if amount < 0:
+        bot.economysystem.withdraw(player_uuid, amount)
+        bot.economysystem.deposit(kokko_uuid, amount)
+    else:
+        bot.economysystem.withdraw(kokko_uuid, amount)
+        bot.economysystem.deposit(player_uuid, amount)

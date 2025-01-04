@@ -11,6 +11,7 @@ class YORODUYA_U1(commands.Cog):
         self.bot = bot
         self.economysystem = self.bot.economysystem
         self.shopsystem = self.bot.shopsystem
+        self.user_status = {}
 
         self.ITEM_HANDLERS = {
             1: item_1.use_item,
@@ -78,7 +79,15 @@ class YORODUYA_U1(commands.Cog):
     @u1shop.command()
     async def use(self, ctx, item_id : int):
         if self.shopsystem.consume_item(str(ctx.author.id), item_id):
+        
+            if self.user_status.get(ctx.author.id, False):
+                return
+
+            self.user_status[ctx.author.id] = True
             await self.item_use(item_id, ctx)
+
+            self.user_status[ctx.author.id] = False
+
         else:
             await ctx.send("そのアイテム持ってないよ笑")
 
