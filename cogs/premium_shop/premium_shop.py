@@ -11,14 +11,7 @@ class PREMIUM(commands.Cog):
         self.bot = bot
         self.economysystem = self.bot.economysystem
         self.shopsystem = self.bot.shopsystem
-
-        self.ROLES = [
-            (1241082277790744717,797377803099570176),
-            (1241082811557875845,797378756573790238),
-            (1241082814661918811,797378769597628457),
-            (1241082818512294092,797378770657869834),
-            (1241082801869295666,797378771786137620),
-        ]
+        self.premiumsystem = self.bot.premiumsystem
 
         self.usage = dedent("""
             ```md
@@ -83,8 +76,8 @@ class PREMIUM(commands.Cog):
                 SELECT premium_level FROM premium_shop WHERE item_id = %s
                 """, (item_id,))
 
-                purchased_premium_level = int(cur.fetchone()[0])
-                role_id = self.ROLES[purchased_premium_level]
+                purchased_premium_level = int(cur.fetchone()[0])-1
+                role_id = self.premiumsystem.ROLES[purchased_premium_level]
 
                 if ctx.author.get_role(role_id[1]) == None:
                     if self.shopsystem.consume_item(str(ctx.author.id), item_id):
@@ -94,6 +87,10 @@ class PREMIUM(commands.Cog):
                 else:
                     await ctx.send(f"既にロール <@&{role_id[0]}> を保有しています！")
                     return
+                
+    @pshop.command()
+    async def checkmy(self, ctx):
+        await ctx.send(self.premiumsystem.get_level_sum(ctx.author))
 
     @pshop.command()
     async def inventory(self, ctx):

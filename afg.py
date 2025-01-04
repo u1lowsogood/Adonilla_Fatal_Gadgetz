@@ -7,6 +7,7 @@ from discord.ext import tasks, commands
 import sys
 from cogs.adonilla_eco_system.economysystem import EconomySystem
 from cogs.shops.shopsystem import ShopSystem
+from cogs.premium_shop.premiumsystem import PremiumSystem
 
 args = sys.argv
 if len(args) != 4:
@@ -29,6 +30,7 @@ class afgBot(commands.Bot):
         self._sqlpassword = args[3]
         self._economysystem = EconomySystem(args[2], args[3])
         self._shopsystem = ShopSystem(args[2], args[3], self.economysystem)
+        self._premiumsystem = PremiumSystem()
     
     @property
     def sqluser(self):
@@ -45,6 +47,10 @@ class afgBot(commands.Bot):
     @property
     def shopsystem(self):
         return self._shopsystem
+    
+    @property
+    def premiumsystem(self):
+        return self._premiumsystem
     
 bot = afgBot()
 

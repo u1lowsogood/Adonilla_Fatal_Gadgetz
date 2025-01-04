@@ -78,10 +78,11 @@ class ECOMMANDS(commands.Cog):
         ranking = self.economysystem.get_ranking(10)
         ranking_msg = "```md\n# 【アドンイラ長者番付】\n\n"
 
-        for order, (user_uuid, balance) in enumerate(ranking, start=1):
+        for order, (user_uuid, balance) in enumerate(ranking):
             member = ctx.guild.get_member(int(user_uuid))
             user_name = member.nick or member.name
-            ranking_msg += f"{order}. {user_name}\n> {balance} ADP\n"
+            orderr = "国庫" if order == 0 else order
+            ranking_msg += f"{orderr}. {user_name}\n> {balance} ADP\n"
 
         ranking_msg += "```"
         await ctx.send(ranking_msg)

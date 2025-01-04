@@ -34,13 +34,27 @@ async def use_item(bot, ctx):
 
     result, amount = await evaluate_conditions(player_uuid, bot, conditions, diff, dice)
 
+    # ベース分送金
+    if amount > 0:
+        gatya_transfer(player_uuid, bot, amount)
+
+    # プレミアム増分送金
+    multiplier = get_premium_multiplier(bot, ctx.author)
+    
+    final_amount = int(amount * multiplier)
+
+    sabun = final_amount - amount
+    bot.economysystem.deposit(player_uuid, sabun)
+    
+    premium_msg = f"`プレミアム倍率 x{multiplier:.2f}=1+(Lv合計/15)*0.5 増分 +{sabun}ADP`"
+    
     if result is None:
         result = dedent(f"""
             # :game_die: {dice}
             # __チャレンジ失敗！__
         """)
     else:
-        result += f"\n# {ctx.author.mention} : {amount} ADP獲得！"
+        result += f"\n# {ctx.author.mention} : {final_amount} ({amount}) ADP獲得！ \n {premium_msg}"
 
     await ctx.reply(result)
 
@@ -53,7 +67,6 @@ async def evaluate_conditions(player_uuid, bot, conditions, diff, dice):
                     amount = await result
                 else:
                     amount = result
-                gatya_transfer(player_uuid, bot, amount)
                 return dedent(f"""
                     # :game_die: {dice}
                     # {message}
@@ -86,6 +99,11 @@ async def combo_bonus(ctx):
         total_bonus += current_bonus
 
     return total_bonus
+
+def get_premium_multiplier(bot,player):
+    max_lv = 15
+    lv_sum = bot.premiumsystem.get_level_sum(player)
+    return 1.0 + (lv_sum / max_lv) * 0.5
 
 def gatya_transfer(player_uuid, bot, amount):
     bot.economysystem.withdraw(str(216478397570744320), amount)
