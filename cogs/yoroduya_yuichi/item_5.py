@@ -35,6 +35,8 @@ async def use_item(bot, ctx):
 
     result, amount = await evaluate_conditions(player_uuid, bot, conditions, diff, dice)
 
+    kokko_uuid = bot.economysystem.get_kokko_uuid()
+
     # ベース分送金
     if amount > 0:
         gatya_transfer(kokko_uuid, player_uuid, bot, amount)
