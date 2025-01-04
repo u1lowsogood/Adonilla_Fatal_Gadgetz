@@ -33,6 +33,10 @@ class ShopSystem:
                     raise ValueError(f"残高が不足しています：{total_price - balance}")
 
                 self.economysystem.withdraw(uuid, total_price)
+
+                kokko_uuid = self.bot.economysystem.get_kokko_uuid()
+                self.bot.economysystem.deposit(kokko_uuid, total_price)
+
                 self.add_item(uuid, item_id, amount)
 
                 return f"""アイテムを購入しました！\n## 『{item_name}』x{amount}\n\n残高:  :moneybag:**__ {balance - total_price} ADP__**"""

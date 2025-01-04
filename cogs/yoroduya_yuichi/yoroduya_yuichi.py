@@ -73,6 +73,7 @@ class YORODUYA_U1(commands.Cog):
         try:
             msg = self.shopsystem.purchase(str(ctx.author.id), item_id, amount)
             await ctx.send(msg)
+
         except ValueError as e:
             await ctx.send(f"{e}")
 

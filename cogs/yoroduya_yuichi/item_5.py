@@ -2,6 +2,7 @@ from textwrap import dedent
 import random
 import asyncio
 import inspect
+import cogs.yoroduya_yuichi.combo as combo
 
 async def use_item(bot, ctx):
 
@@ -27,7 +28,7 @@ async def use_item(bot, ctx):
         (0, lambda: kokko_balance, "__！！！！！！チャレンジ成功全財産略奪！！！！！！__"),
         (1, lambda: kokko_balance // 50, "__プラマイ1 超超超ニアミス:moneybag: ！！！__"),
         (10, lambda: kokko_balance // 300, "__:moneybag: プラマイ10 超ニアミス:moneybag: ！！！__"),
-        (100, lambda: kokko_balance // 1000, "__:moneybag: プラマイ１００！！！:moneybag: __"),
+        (100, lambda: infinite_combo_bonus(ctx), "__:moneybag: 無限ジャックポット終了！！！:moneybag: __"),
         (500, lambda: combo_bonus(ctx), "__:moneybag: ジャックポット終了:moneybag: ！__"),
         (1000, lambda: kokko_balance // 9000, "__:moneybag:プラマイ１０００ 健闘賞！！！:moneybag:__"),
         (3000, lambda: random.choice([1, 10, 50, 100, 500]), "__プラマイ３０００ 自販機の下の小銭あげますで賞！！！__"),
@@ -38,26 +39,30 @@ async def use_item(bot, ctx):
     kokko_uuid = bot.economysystem.get_kokko_uuid()
 
     # ベース分送金
+    gatya_transfer(kokko_uuid, player_uuid, bot, amount)
+
+    final_amount = amount
+    earn_msg = ""
+
     if amount > 0:
-        gatya_transfer(kokko_uuid, player_uuid, bot, amount)
+        multiplier = get_premium_multiplier(bot, ctx.author)
+        final_amount = int(amount * multiplier)
+        sabun = final_amount - amount
+        bot.economysystem.deposit(player_uuid, sabun)
 
-    # プレミアム増分送金
-    multiplier = get_premium_multiplier(bot, ctx.author)
-    
-    final_amount = int(amount * multiplier)
+        earn_msg = f"{final_amount}({amount}) ADP獲得！"
+        premium_msg = f"`プレミアム倍率 x{multiplier:.2f}=1+(Lv合計/15)*0.5 増分 +{sabun}ADP`"
+    else:
+        earn_msg = f"{final_amount} ADP損失……"
+        premium_msg = f"`悲しいねｗ`"
 
-    sabun = final_amount - amount
-    bot.economysystem.deposit(player_uuid, sabun)
-    
-    premium_msg = f"`プレミアム倍率 x{multiplier:.2f}=1+(Lv合計/15)*0.5 増分 +{sabun}ADP`"
-    
     if result is None:
         result = dedent(f"""
             # :game_die: {dice}
             # __チャレンジ失敗！__
         """)
     else:
-        result += f"\n# {ctx.author.mention} : {final_amount} ({amount}) ADP獲得！ \n {premium_msg}"
+        result += f"\n# {ctx.author.mention} :  {earn_msg} \n {premium_msg}"
 
     await ctx.reply(result)
 
@@ -77,31 +82,18 @@ async def evaluate_conditions(player_uuid, bot, conditions, diff, dice):
     return None, 0
 
 async def combo_bonus(ctx):
-    bonus_steps = [
-        (3, 100, ["", ""]),
-        (6, 300, ["**", "**"]),
-        (9, 600, ["__**", "**__"]),
-        (12, 1200, ["## __", "__"]),
-        (15, 5000, ["# __*MAX COMBO！！！", "*__"]),
+    combos = [
+        combo.CHIKUCOMBO(),
+        combo.BICOMBO(),
+        combo.DEATHCOMBO(),
     ]
-    bonus_iterator = iter(bonus_steps)
-    current_range, current_bonus, decorator = next(bonus_iterator)
+    cb = random.choices(combos,weights=[9,1,2],k=1)[0]
+    result = await cb.combo_bonus(ctx)
+    return result
 
-    total_bonus = 0
-    combo_count = random.randint(4, 13)
-
-    await ctx.reply("# !!:moneybag: プラマイ５００JACKPOT :moneybag: スタート!!\nhttps://media1.tenor.com/m/0YSqS0ixtm4AAAAd/pon.gif")
-
-    for i in range(combo_count):
-        if i + 1 > current_range:
-            current_range, current_bonus, decorator = next(bonus_iterator)
-
-        combomsg = f"{decorator[0]}{ctx.author.mention} {i + 1} COMBO! :moneybag:+{current_bonus} ADP{decorator[1]}"
-        await ctx.send(combomsg)
-        await asyncio.sleep(1)
-        total_bonus += current_bonus
-
-    return total_bonus
+async def infinite_combo_bonus(ctx):
+    result = await combo.INFINITECOMBO().combo_bonus(ctx)
+    return result
 
 def get_premium_multiplier(bot,player):
     max_lv = 15
@@ -110,8 +102,8 @@ def get_premium_multiplier(bot,player):
 
 def gatya_transfer(kokko_uuid, player_uuid, bot, amount):
     if amount < 0:
-        bot.economysystem.withdraw(player_uuid, amount)
-        bot.economysystem.deposit(kokko_uuid, amount)
+        bot.economysystem.withdraw(player_uuid, -amount)
+        bot.economysystem.deposit(kokko_uuid, -amount)
     else:
         bot.economysystem.withdraw(kokko_uuid, amount)
         bot.economysystem.deposit(player_uuid, amount)
