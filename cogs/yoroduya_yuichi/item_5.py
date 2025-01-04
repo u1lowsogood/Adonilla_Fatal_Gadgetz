@@ -20,15 +20,16 @@ async def use_item(bot, ctx):
     diff = abs(target - dice)
 
     player_uuid = str(ctx.author.id)
-    u1_balance = bot.economysystem.get_balance(str(216478397570744320))
+    kokko_uuid = bot.economysystem.get_kokko_uuid()
+    kokko_balance = bot.economysystem.get_balance(kokko_uuid)
 
     conditions = [
-        (0, lambda: u1_balance, "__！！！！！！チャレンジ成功全財産略奪！！！！！！__"),
-        (1, lambda: u1_balance // 50, "__プラマイ1 超超超ニアミス:moneybag: ！！！__"),
-        (10, lambda: u1_balance // 300, "__:moneybag: プラマイ10 超ニアミス:moneybag: ！！！__"),
-        (100, lambda: u1_balance // 1000, "__:moneybag: プラマイ１００！！！:moneybag: __"),
+        (0, lambda: kokko_balance, "__！！！！！！チャレンジ成功全財産略奪！！！！！！__"),
+        (1, lambda: kokko_balance // 50, "__プラマイ1 超超超ニアミス:moneybag: ！！！__"),
+        (10, lambda: kokko_balance // 300, "__:moneybag: プラマイ10 超ニアミス:moneybag: ！！！__"),
+        (100, lambda: kokko_balance // 1000, "__:moneybag: プラマイ１００！！！:moneybag: __"),
         (500, lambda: combo_bonus(ctx), "__:moneybag: ジャックポット終了:moneybag: ！__"),
-        (1000, lambda: u1_balance // 9000, "__:moneybag:プラマイ１０００ 健闘賞！！！:moneybag:__"),
+        (1000, lambda: kokko_balance // 9000, "__:moneybag:プラマイ１０００ 健闘賞！！！:moneybag:__"),
         (3000, lambda: random.choice([1, 10, 50, 100, 500]), "__プラマイ３０００ 自販機の下の小銭あげますで賞！！！__"),
     ]
 
@@ -36,7 +37,7 @@ async def use_item(bot, ctx):
 
     # ベース分送金
     if amount > 0:
-        gatya_transfer(player_uuid, bot, amount)
+        gatya_transfer(kokko_uuid, player_uuid, bot, amount)
 
     # プレミアム増分送金
     multiplier = get_premium_multiplier(bot, ctx.author)
@@ -105,6 +106,6 @@ def get_premium_multiplier(bot,player):
     lv_sum = bot.premiumsystem.get_level_sum(player)
     return 1.0 + (lv_sum / max_lv) * 0.5
 
-def gatya_transfer(player_uuid, bot, amount):
-    bot.economysystem.withdraw(str(216478397570744320), amount)
+def gatya_transfer(kokko_uuid, player_uuid, bot, amount):
+    bot.economysystem.withdraw(kokko_uuid, amount)
     bot.economysystem.deposit(player_uuid, amount)
