@@ -52,23 +52,22 @@ class ShopSystem:
     def consume_item(self, uuid, item_id):
         with self._connect() as conn:
             with conn.cursor() as cur:
-                # 在庫確認
+
                 cur.execute("""
                     SELECT amount FROM inventory WHERE user_uuid = %s AND item_id = %s
                 """, (uuid, item_id))
                 inventory_item = cur.fetchone()
-                if not inventory_item or inventory_item[0] <= 0:
-                    raise ValueError("そのアイテムを所持していません！")
 
-                # 在庫を更新
+                if not inventory_item or inventory_item[0] <= 0:
+                    return False
+
                 cur.execute("""
                     UPDATE inventory SET amount = amount - 1
                     WHERE user_uuid = %s AND item_id = %s
-                """, (uuid, item_id,))
+                """, (uuid, item_id))
                 conn.commit()
-
-                return item_id
-
+                return True
+            
     def get_shop_items(self, shop_id):
         with self._connect() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
@@ -90,7 +89,7 @@ class ShopSystem:
                     FROM inventory
                     JOIN items ON items.id = inventory.item_id
                     JOIN shops ON items.shop_id = shops.id
-                    WHERE inventory.user_uuid = %s AND shops.id = %s
+                    WHERE inventory.user_uuid = %s AND shops.id = %s AND inventory.amount > 0
                     ORDER BY items.id ASC
                 """, (uuid, shop_id,))
                 items = cur.fetchall()

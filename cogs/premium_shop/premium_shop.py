@@ -3,32 +3,32 @@ import psycopg2
 from psycopg2.extras import DictCursor
 from textwrap import dedent
 
-from cogs.yoroduya_yuichi import item_1, item_2, item_3,item_4,item_5
+from cogs.premium_shop import purchase_premium
 
-class YORODUYA_U1(commands.Cog):
+class PREMIUM(commands.Cog):
     def __init__(self, bot):
-        self.shop_id = 1
+        self.shop_id = 2
         self.bot = bot
         self.economysystem = self.bot.economysystem
         self.shopsystem = self.bot.shopsystem
 
-        self.ITEM_HANDLERS = {
-            1: item_1.use_item,
-            2: item_2.use_item,
-            3: item_3.use_item,
-            4: item_4.use_item,
-            5: item_5.use_item,
-        }
+        self.ROLES = [
+            (1241082277790744717,797377803099570176),
+            (1241082811557875845,797378756573790238),
+            (1241082814661918811,797378769597628457),
+            (1241082818512294092,797378770657869834),
+            (1241082801869295666,797378771786137620),
+        ]
 
         self.usage = dedent("""
             ```md
             # 【用法】
             購入方法：
-            /u1shop buy アイテム番号
+            /pshop buy アイテム番号
             使用方法：
-            /u1shop use アイテム番号
+            /pshop use アイテム番号
             インベントリ：
-            /u1shop inventory
+            /pshop inventory
             ```
         """)
 
@@ -38,18 +38,18 @@ class YORODUYA_U1(commands.Cog):
             password=self.bot.sqlpassword,
             host="localhost",
             port="5432",
-            dbname="yoroduya_u1"
+            dbname="adonilla_economy_system"
         )
 
     @commands.group(invoke_without_command=True)
-    async def u1shop(self, ctx):
+    async def pshop(self, ctx):
         msg = ""
         welcome = dedent(f"""
             ```md
-            # 【よろづやゆういち】
+            # 【プレミアムショップ】
 
-            チリンチリン…… 
-            『{ctx.author.nick or ctx.author.name}』さん、いらっしゃい！品揃え抜群だよ！
+            都内アドンイラタワービル最上階、秘密のペントハウス……
+            ようこそ、『{ctx.author.nick or ctx.author.name}』様。当店はプレミアムな品を揃えております。
             ```
         """)
         msg += welcome
@@ -67,7 +67,7 @@ class YORODUYA_U1(commands.Cog):
 
         await ctx.send(msg)
 
-    @u1shop.command()
+    @pshop.command()
     async def buy(self, ctx, item_id : int, amount: int = 1):
         try:
             msg = self.shopsystem.purchase(str(ctx.author.id), item_id, amount)
@@ -75,23 +75,33 @@ class YORODUYA_U1(commands.Cog):
         except ValueError as e:
             await ctx.send(f"{e}")
 
-    @u1shop.command()
+    @pshop.command()
     async def use(self, ctx, item_id : int):
-        if self.shopsystem.consume_item(str(ctx.author.id), item_id):
-            await self.item_use(item_id, ctx)
-        else:
-            await ctx.send("そのアイテム持ってないよ笑")
+        with self._connect() as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                SELECT premium_level FROM premium_shop WHERE item_id = %s
+                """, (item_id,))
 
-    async def item_use(self, used_item, ctx):
-        await self.ITEM_HANDLERS[used_item](self.bot, ctx)
+                purchased_premium_level = int(cur.fetchone()[0])
+                role_id = self.ROLES[purchased_premium_level]
 
-    @u1shop.command()
+                if ctx.author.get_role(role_id[1]) == None:
+                    if self.shopsystem.consume_item(str(ctx.author.id), item_id):
+                        await purchase_premium.use_item(self.bot,ctx,role_id)
+                    else:
+                        await ctx.send("引換券持ってないよ笑")
+                else:
+                    await ctx.send(f"既にロール <@&{role_id[0]}> を保有しています！")
+                    return
+
+    @pshop.command()
     async def inventory(self, ctx):
         items = self.shopsystem.get_inventory_items(str(ctx.author.id), self.shop_id)
         sendmsg = dedent(f"""
             ```md
-            # 【インベントリ：よろづやゆういち】
-            あなたはバッグを開いた。
+            # 【インベントリ：プレミアムショップ】
+            あなたは財布（高級な皮の！）を開いた。
             ``````md
         """)
         if len(items)==0:
@@ -101,10 +111,10 @@ class YORODUYA_U1(commands.Cog):
         sendmsg += dedent("""
             ``````
             使用方法：
-            /u1shop use アイテム番号
+            /pshop use アイテム番号
             ```
         """)
         await ctx.send(sendmsg)
 
 async def setup(bot):
-    await bot.add_cog(YORODUYA_U1(bot))
+    await bot.add_cog(PREMIUM(bot))

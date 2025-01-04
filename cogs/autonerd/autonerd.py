@@ -69,10 +69,10 @@ class AutoNerd(commands.Cog):
             "🤓 ❤️ 👴 ",
             "👨‍🦰 🔪 🤓 ",
             "🤓 🫲 👴 ",
-            "👶 ➡️ 🤓 ",
-            "👶 ⬅️ 🤓 ",
-            "🤓 ☝️ 🇸 🇹 🇺 🇵 🇮 🇩 ",
-            "🤓 ☝️ 🇲 🇦 🇽 🇧 🅰️ 🇰 🔼 ",
+            "👶➡️🤓",
+            "👶⬅️🤓",
+            "🤓☝️ 🇸 🇹 🇺 🇵 🇮 🇩 ",
+            "🤓☝️ 🇲 🇦 🇽 🇧 🅰️ 🇰 🔼 ",
             "💊 🤓 ",
             "👴🔪  🤓 🫀 🧠 🫁🩸 ",
             "🤓❤️‍🔥 ",
@@ -100,8 +100,7 @@ class AutoNerd(commands.Cog):
 
             #choiced = random.choice(self.reactions).replace(' ', '')
             choicedindex = random.randrange(len(self.reactions))
-            choiced = self.reactions[choicedindex].replace(' ', '')
-
+            choiced = self.reactions[choicedindex].replace(' ', '').replace('　', '')
             for i, emoji in enumerate(choiced):
                 try:
                     await msg.add_reaction(emoji)
