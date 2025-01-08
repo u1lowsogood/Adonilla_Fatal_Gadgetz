@@ -3,7 +3,7 @@ import psycopg2
 from psycopg2.extras import DictCursor
 from textwrap import dedent
 
-from cogs.yoroduya_yuichi import item_1, item_2, item_3,item_4,item_5
+from cogs.yoroduya_yuichi import item_1, item_2, item_3,item_4,item_5,item_6,item_7,item_8
 
 class YORODUYA_U1(commands.Cog):
     def __init__(self, bot):
@@ -19,6 +19,9 @@ class YORODUYA_U1(commands.Cog):
             3: item_3.use_item,
             4: item_4.use_item,
             5: item_5.use_item,
+            11: item_6.use_item,
+            12: item_7.use_item,
+            13: item_8.use_item,
         }
 
         self.usage = dedent("""
