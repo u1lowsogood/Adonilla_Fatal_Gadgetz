@@ -13,9 +13,6 @@ class PremiumSystem:
             (1241082801869295666,797378771786137620),
         ]
 
-    def _connect(self):
-        return psycopg2.connect(user=self.sqluser, password=self.sqlpassword, host="localhost", port="5432", dbname="adonilla_economy_system")
-
     def get_level_sum(self, member):
         sm = 0
         for i, roles in enumerate(self.ROLES,start=1):

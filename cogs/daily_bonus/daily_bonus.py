@@ -1,3 +1,5 @@
+import discord.ext
+import discord.ext.commands
 import psycopg2
 from psycopg2.extras import DictCursor
 from discord.ext import commands
@@ -17,13 +19,20 @@ class DAILY(commands.Cog):
     def _connect(self):
         return psycopg2.connect(user=self.bot.sqluser, password=self.bot.sqlpassword, host="localhost", port="5432", dbname="adonilla_economy_system")
 
+    @commands.Cog.listener()
+    async def on_command_error(self,ctx, err):
+        if isinstance(err, commands.CommandOnCooldown):
+            return await ctx.send("コマンド入力早すぎるｗ（2秒に１回制限）")
+    
     @commands.group(invoke_without_command=True)
+    @commands.cooldown(1, 2, type=discord.ext.commands.BucketType.user)
     async def daily(self, ctx):
         user_uuid = str(ctx.author.id) 
         eligible, lasttime = await self.check_and_update_daily_bonus(user_uuid)
 
-        if random.randint(1,100) == 1:
+        if random.randint(1,30) == 1:
             eligible = True
+            await ctx.send("# 強制開催！！！")
 
         if eligible:
             await self.do(ctx,user_uuid)
@@ -40,6 +49,9 @@ class DAILY(commands.Cog):
             await ctx.send(msg)
     
     async def do(self,ctx,user_uuid):
+
+        await ctx.send("# __デイリーADP！__")
+
         total_money = 0
 
         result, money = await self.start_daily_bonus_roulette(ctx)
@@ -57,7 +69,7 @@ class DAILY(commands.Cog):
 
         await asyncio.sleep(1) 
         finished_msg = dedent(f"""
-            # 合計{total_money} ADPを獲得しました！
+            # __:moneybag:  合計{total_money} ADPを獲得しました！:moneybag:  __
             次回：
             **{self.between_hour} 時間後……**
         """)
@@ -69,7 +81,6 @@ class DAILY(commands.Cog):
         result = self.roll_weighted_dice()
 
         msg = dedent(f"""
-            # __デイリーADP！__
             # :game_die:１～６ ×{self.base_multiply} ADPを獲得できます。
             ` 偶数が出たらもう一度引けるチャンス！？ `
         """)
