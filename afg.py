@@ -97,6 +97,7 @@ cogz = [
     "cogs.yoroduya_yuichi.yoroduya_yuichi",
     "cogs.daily_bonus.daily_bonus",
     "cogs.premium_shop.premium_shop",
+    "cogs.kusodeka.kusodeka",
     #"cogs.depressed_battle.depressed_battle",
     ]
 
