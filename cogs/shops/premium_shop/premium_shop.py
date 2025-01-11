@@ -3,7 +3,7 @@ import psycopg2
 from psycopg2.extras import DictCursor
 from textwrap import dedent
 
-from cogs.premium_shop import purchase_premium
+from cogs.shops.premium_shop import purchase_premium
 
 class PREMIUM(commands.Cog):
     def __init__(self, bot):

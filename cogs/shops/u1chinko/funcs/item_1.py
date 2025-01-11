@@ -2,7 +2,7 @@ from textwrap import dedent
 import random
 import asyncio
 import inspect
-import cogs.yoroduya_yuichi.combo as combo
+import cogs.shops.u1chinko.funcs.combo as combo
 
 async def use_item(bot, ctx, ticket_multiplier = 1):
 

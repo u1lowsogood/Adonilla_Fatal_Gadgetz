@@ -3,57 +3,46 @@ import psycopg2
 from psycopg2.extras import DictCursor
 from textwrap import dedent
 
-from cogs.yoroduya_yuichi import item_1, item_2, item_3,item_4,item_5,item_6,item_7,item_8
+from cogs.shops.u1chinko.funcs import item_1, item_2, item_3, item_4
 
-class YORODUYA_U1(commands.Cog):
+class U1CHINKO(commands.Cog):
     def __init__(self, bot):
-        self.shop_id = 1
+        self.shop_id = 3
+        self.shop_name = "u1chinko"
         self.bot = bot
         self.economysystem = self.bot.economysystem
         self.shopsystem = self.bot.shopsystem
         self.user_status = {}
 
-        self.ITEM_HANDLERS = {
-            1: item_1.use_item,
-            2: item_2.use_item,
-            3: item_3.use_item,
-            4: item_4.use_item,
-            5: item_5.use_item,
-            11: item_6.use_item,
-            12: item_7.use_item,
-            13: item_8.use_item,
-        }
+        self.ITEM_HANDLERS = [
+            item_1.use_item,
+            item_2.use_item,
+            item_3.use_item,
+            item_4.use_item,
+        ]
 
-        self.usage = dedent("""
+        self.usage = dedent(f"""
             ```md
             # 【用法】
             購入方法：
-            /u1shop buy アイテム番号
+            /{self.shop_name} buy アイテム番号
             使用方法：
-            /u1shop use アイテム番号
+            /{self.shop_name} use アイテム番号
             インベントリ：
-            /u1shop inventory
+            /{self.shop_name} inventory
             ```
         """)
 
-    def _connect(self):
-        return psycopg2.connect(
-            user=self.bot.sqluser,
-            password=self.bot.sqlpassword,
-            host="localhost",
-            port="5432",
-            dbname="yoroduya_u1"
-        )
-
     @commands.group(invoke_without_command=True)
-    async def u1shop(self, ctx):
+    async def u1chinko(self, ctx):
         msg = ""
         welcome = dedent(f"""
             ```md
-            # 【よろづやゆういち】
+            # 【ゆういチンコ本舗】
 
-            チリンチリン…… 
-            『{ctx.author.nick or ctx.author.name}』さん、いらっしゃい！品揃え抜群だよ！
+            キュインキュインキュイン！！！ドチュゥイイイイイン！
+            ピ↑ ロ↓リ↑ピ↓ロ↑リ！！！
+            『{ctx.author.nick or ctx.author.name}』様でよろしいでしょうか？
             ```
         """)
         msg += welcome
@@ -71,18 +60,18 @@ class YORODUYA_U1(commands.Cog):
 
         await ctx.send(msg)
 
-    @u1shop.command()
+    @u1chinko.command()
     async def buy(self, ctx, item_id : int, amount: int = 1):
         try:
-            msg = self.shopsystem.purchase(str(ctx.author.id), item_id, amount)
+            msg = self.shopsystem.purchase(str(ctx.author.id), self.shop_id, item_id, amount)
             await ctx.send(msg)
 
         except ValueError as e:
             await ctx.send(f"{e}")
 
-    @u1shop.command()
+    @u1chinko.command()
     async def use(self, ctx, item_id : int):
-        if self.shopsystem.consume_item(str(ctx.author.id), item_id):
+        if self.shopsystem.consume_item(str(ctx.author.id), self.shop_id, item_id):
         
             if self.user_status.get(ctx.author.id, False):
                 return
@@ -96,28 +85,28 @@ class YORODUYA_U1(commands.Cog):
             await ctx.send("そのアイテム持ってないよ笑")
 
     async def item_use(self, used_item, ctx):
-        await self.ITEM_HANDLERS[used_item](self.bot, ctx)
+        await self.ITEM_HANDLERS[used_item-1](self.bot, ctx)
 
-    @u1shop.command()
+    @u1chinko.command()
     async def inventory(self, ctx):
         items = self.shopsystem.get_inventory_items(str(ctx.author.id), self.shop_id)
         sendmsg = dedent(f"""
             ```md
-            # 【インベントリ：よろづやゆういち】
-            あなたはバッグを開いた。
+            # 【インベントリ：{self.shop_name}】
+            あなたはドル箱を確認した。
             ``````md
         """)
         if len(items)==0:
             sendmsg+="空"
         for item in items:
             sendmsg += f"{item[0]}. 『{item[1]}』 x{item[3]}\n{item[2]}\n"
-        sendmsg += dedent("""
+        sendmsg += dedent(f"""
             ``````
             使用方法：
-            /u1shop use アイテム番号
+            /{self.shop_name} use アイテム番号
             ```
         """)
         await ctx.send(sendmsg)
 
 async def setup(bot):
-    await bot.add_cog(YORODUYA_U1(bot))
+    await bot.add_cog(U1CHINKO(bot))
