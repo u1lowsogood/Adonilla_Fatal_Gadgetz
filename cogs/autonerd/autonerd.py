@@ -121,9 +121,17 @@ class AutoNerd(commands.Cog):
                     bonusmsg += f"{t[2]} +{t[1]}ADP!"
 
             self.economysystem.deposit(str(msg.author.id),amount)
-            replymsg = await msg.reply(f"オタクが反応！ {amount} ADP獲得！" + bonusmsg)
-            #await asyncio.sleep(2) 
-            #await replymsg.delete()
+
+            second = 3
+            react_text = f"オタクが反応！ {amount} ADP獲得！{bonusmsg} ({second})"
+            replymsg : discord.Message = await msg.reply(react_text)
+
+            for i in range(3):
+                second-=1
+                react_text = f"オタクが反応！ {amount} ADP獲得！{bonusmsg} ({second})"
+                await asyncio.sleep(1) 
+                await replymsg.edit(content=react_text)
+            await replymsg.delete()
 
             return
 

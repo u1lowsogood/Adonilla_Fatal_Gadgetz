@@ -6,8 +6,8 @@ import discord
 from discord.ext import tasks, commands
 import sys
 from cogs.adonilla_eco_system.economysystem import EconomySystem
-from cogs.shops.shopsystem import ShopSystem
-from cogs.premium_shop.premiumsystem import PremiumSystem
+from cogs.shops.shops.shopsystem import ShopSystem
+from cogs.shops.premium_shop.premiumsystem import PremiumSystem
 
 args = sys.argv
 if len(args) != 4:
@@ -92,11 +92,14 @@ cogz = [
     "cogs.curse.curse",
     "cogs.todorate.todorate",
     "cogs.convertfxtwitter.convertfxtwitter",
-    "cogs.adonilla_eco_system.eco_commands",
-    "cogs.shops.shops",
-    "cogs.yoroduya_yuichi.yoroduya_yuichi",
     "cogs.daily_bonus.daily_bonus",
-    "cogs.premium_shop.premium_shop",
+    "cogs.kusodeka.kusodeka",
+
+    "cogs.adonilla_eco_system.eco_commands",
+    "cogs.shops.shops.shops",
+    "cogs.shops.premium_shop.premium_shop",
+    "cogs.shops.yoroduya_yuichi.yoroduya_yuichi",
+    "cogs.shops.u1chinko.u1chinko"
     #"cogs.depressed_battle.depressed_battle",
     ]
 

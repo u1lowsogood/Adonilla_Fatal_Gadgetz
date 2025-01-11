@@ -22,7 +22,6 @@ class SHOPS(commands.Cog):
             for shop in self.get_shops():
                 shop_list += f"""```md
 # 【{shop[1]}】
-
 {shop[2]}
 ```"""
             await ctx.send(shop_list)
