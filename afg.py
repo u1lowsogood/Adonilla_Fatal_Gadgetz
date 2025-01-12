@@ -100,6 +100,7 @@ cogz = [
     "cogs.shops.premium_shop.premium_shop",
     "cogs.shops.yoroduya_yuichi.yoroduya_yuichi",
     "cogs.shops.u1chinko.u1chinko"
+    "cogs.shops.umaotoko.umaotoko_command"
     #"cogs.depressed_battle.depressed_battle",
     ]
 
