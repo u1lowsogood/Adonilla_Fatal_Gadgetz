@@ -1,10 +1,11 @@
-from discord.ext import commands
-import psycopg2
-from psycopg2.extras import DictCursor
 from textwrap import dedent
 
-from cogs.shops.yoroduya_yuichi.funcs import item_1, item_2, item_3,item_4
-from cogs.shops.umaotoko.Model.umaotoko import Umaotoko
+import psycopg2
+from discord.ext import commands
+from psycopg2.extras import DictCursor
+
+from cogs.shops.umaotoko.umaotoko import RaceManager
+
 
 class JRA(commands.Cog):
     def __init__(self, bot):
@@ -13,8 +14,7 @@ class JRA(commands.Cog):
         self.bot = bot
         self.economysystem = self.bot.economysystem
         self.shopsystem = self.bot.shopsystem
-
-        self.umaotoko = Umaotoko(self.bot, self.ctx)
+        self.raceManager = None
 
         self.usage = dedent("""
             ```md
@@ -49,7 +49,7 @@ class JRA(commands.Cog):
                 {item[2]}
                 > {item[3]} ADP
             """)
-        msg += "```\n"
+        msg += "\n```\n"
         msg += self.usage
 
         await ctx.send(msg)
@@ -103,8 +103,9 @@ class JRA(commands.Cog):
         await ctx.send(sendmsg)
 
     @jra.command()
-    async def start(self):
-        await self.umaotoko.start()
+    async def start(self, ctx):
+        self.raceManager = RaceManager(self.bot, ctx)
+        await self.raceManager.start_race()
 
 async def setup(bot):
     await bot.add_cog(JRA(bot))

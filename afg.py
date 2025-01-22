@@ -28,6 +28,7 @@ class afgBot(commands.Bot):
         super().__init__(command_prefix="/",intents=intents)
         self._sqluser = args[2]
         self._sqlpassword = args[3]
+        self._adonilla_id = 364043473768284161
         self._economysystem = EconomySystem(args[2], args[3])
         self._shopsystem = ShopSystem(args[2], args[3], self.economysystem)
         self._premiumsystem = PremiumSystem()
@@ -51,6 +52,10 @@ class afgBot(commands.Bot):
     @property
     def premiumsystem(self):
         return self._premiumsystem
+    
+    @property
+    def adonilla_id(self):
+        return self._adonilla_id
     
 bot = afgBot()
 
@@ -99,8 +104,8 @@ cogz = [
     "cogs.shops.shops.shops",
     "cogs.shops.premium_shop.premium_shop",
     "cogs.shops.yoroduya_yuichi.yoroduya_yuichi",
-    "cogs.shops.u1chinko.u1chinko"
-    "cogs.shops.umaotoko.umaotoko_command"
+    "cogs.shops.u1chinko.u1chinko",
+    "cogs.shops.umaotoko.umaotoko_command",
     #"cogs.depressed_battle.depressed_battle",
     ]
 
