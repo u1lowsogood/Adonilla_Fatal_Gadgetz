@@ -95,7 +95,7 @@ class AutoNerd(commands.Cog):
         
         if self.sended_amount > self.next_amount:
 
-            self.next_amount = random.randint(19,40)
+            self.next_amount = random.randint(40,80)
             self.sended_amount = 0
 
             #choiced = random.choice(self.reactions).replace(' ', '')
@@ -122,15 +122,26 @@ class AutoNerd(commands.Cog):
 
             self.economysystem.deposit(str(msg.author.id),amount)
 
-            second = 3
-            react_text = f"オタクが反応！ {amount} ADP獲得！{bonusmsg} ({second})"
-            replymsg : discord.Message = await msg.reply(react_text)
+            react_text = f"オタクが反応！ {amount} ADP獲得！{bonusmsg}"
+            replymsg: discord.Message = await msg.reply(react_text)
+            text_list = list(react_text)
+            await asyncio.sleep(1)
 
-            for i in range(3):
-                second-=1
-                react_text = f"オタクが反応！ {amount} ADP獲得！{bonusmsg} ({second})"
-                await asyncio.sleep(1) 
-                await replymsg.edit(content=react_text)
+            for _ in range(3):
+                await asyncio.sleep(1)
+                kouho_to_fill = [i for i, char in enumerate(text_list) if char != "🤓"]
+                if kouho_to_fill:
+                    num_to_fill = max(1, len(kouho_to_fill) // 3)
+                    for i in random.sample(kouho_to_fill, num_to_fill):
+                        text_list[i] = "🤓"
+
+                react_text = "".join(text_list) 
+                await replymsg.edit(content=react_text) 
+
+            await asyncio.sleep(1)
+            await replymsg.edit(content="".join(["🤓"*len(react_text)]))
+
+            await asyncio.sleep(1)
             await replymsg.delete()
 
             return

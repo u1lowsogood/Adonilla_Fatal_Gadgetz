@@ -30,7 +30,7 @@ class DAILY(commands.Cog):
         user_uuid = str(ctx.author.id) 
         eligible, lasttime = await self.check_and_update_daily_bonus(user_uuid)
 
-        if random.randint(1,30) == 1:
+        if eligible == False and random.randint(1,30) == 1:
             eligible = True
             await ctx.send("# 強制開催！！！")
 
