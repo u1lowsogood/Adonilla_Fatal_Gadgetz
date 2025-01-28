@@ -83,7 +83,7 @@ class YORODUYA_U1(commands.Cog):
             await ctx.send("そのアイテム持ってないよ笑")
 
     async def item_use(self, used_item, ctx):
-        await self.ITEM_HANDLERS[used_item-1](self.bot, ctx)
+        await self.ITEM_HANDLERS[used_item](self.bot, ctx)
 
     @u1shop.command()
     async def inventory(self, ctx):

@@ -70,6 +70,15 @@ class U1CHINKO(commands.Cog):
             await ctx.send(f"{e}")
 
     @u1chinko.command()
+    async def buy_test(self, ctx):
+        try:
+            msg = self.shopsystem.purchase(str(ctx.author.id), self.shop_id, item_id, amount)
+            await ctx.send(msg)
+
+        except ValueError as e:
+            await ctx.send(f"{e}")
+
+    @u1chinko.command()
     async def use(self, ctx, item_id : int):
         if self.shopsystem.consume_item(str(ctx.author.id), self.shop_id, item_id):
         
