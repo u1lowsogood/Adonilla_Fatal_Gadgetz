@@ -24,21 +24,34 @@ class ExpSystem:
     def _connect(self):
         return psycopg2.connect(user=self.sqluser, password=self.sqlpassword, host="localhost", port="5432", dbname="exp")
 
-    def _ensure_exp_exists(self, user_uuid : int):
+    async def _ensure_exp_exists(self, member: discord.Member):
+        user_uuid = member.id
+        default_nick = f"{member.name} 【Lv. 0】"
+
         with self._connect() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
                 cur.execute(
-                    "INSERT INTO exp (level, user_uuid, exp_current, exp_max) VALUES (%s, %s, %s, %s) ON CONFLICT DO NOTHING",
+                    """
+                    INSERT INTO exp (level, user_uuid, exp_current, exp_max) 
+                    VALUES (%s, %s, %s, %s) 
+                    ON CONFLICT (user_uuid) DO NOTHING
+                    RETURNING user_uuid
+                    """,
                     (0, user_uuid, 0, self.exp_initial_max)
                 )
+                inserted = cur.fetchone()
                 conn.commit()
+
+        if inserted:
+            await member.edit(nick=default_nick)
+
 
     async def add_exp(self, member : discord.Member, exp_amount):
         user_uuid = member.id
         if exp_amount < 0:
             return
         
-        self._ensure_exp_exists(user_uuid)
+        await self._ensure_exp_exists(member)
         with self._connect() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
                 cur.execute("SELECT exp_current,exp_max,level FROM exp WHERE user_uuid = %s", (user_uuid,))
@@ -78,8 +91,9 @@ class ExpSystem:
         except discord.Forbidden:
             print(f"権限ないよ（笑） {member.name}")
 
-    def get_status(self, user_uuid):
-        self._ensure_exp_exists(user_uuid)
+    async def get_status(self, member : discord.Member):
+        user_uuid = member.id
+        await self._ensure_exp_exists(member)
         with self._connect() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cur:
                 cur.execute("SELECT level,exp_current,exp_max FROM exp WHERE user_uuid = %s", (user_uuid,))
@@ -106,9 +120,7 @@ class ExpSystem:
         if member is None:
             member = ctx.author
 
-        user_id = member.id
-
-        status = self.get_status(user_id)
+        status = await self.get_status(member)
 
         level = status['level']
         bunshi = status['exp_current']
