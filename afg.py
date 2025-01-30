@@ -1,9 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import asyncio
-from typing import Any, Coroutine, Optional
 import discord
-from discord.ext import tasks, commands
+from discord.ext import commands
 from system_manager import SystemManager
 import sys
 
@@ -28,7 +26,7 @@ class afgBot(commands.Bot):
         self._sqluser = args[2]
         self._sqlpassword = args[3]
         self._adonilla_id = 364043473768284161
-        self._system_manager = SystemManager(self._sqluser, self._sqlpassword)
+        self._system_manager = SystemManager(self._sqluser, self._sqlpassword, self)
     
     @property
     def sqluser(self):
@@ -94,7 +92,8 @@ cogz = [
     "cogs.shops.yoroduya_yuichi.yoroduya_yuichi",
     "cogs.shops.u1chinko.u1chinko",
     "cogs.shops.umaotoko.umaotoko_command",
-    "cogs.exp.exp"
+    "cogs.exp.exp_commands",
+    "cogs.exp.exp_listeners"
     #"cogs.depressed_battle.depressed_battle",
     ]
 

@@ -4,11 +4,11 @@ from cogs.shops.premium_shop.premiumsystem import PremiumSystem
 from cogs.exp.expsystem import ExpSystem
 
 class SystemManager:
-    def __init__(self, sqluser, sqlpassword):
+    def __init__(self, sqluser, sqlpassword, bot):
         self.economy = EconomySystem(sqluser, sqlpassword)
         self.shop = ShopSystem(sqluser, sqlpassword, self.economy)
         self.premium = PremiumSystem()
-        self.exp = ExpSystem(sqluser, sqlpassword)
+        self.exp = ExpSystem(sqluser, sqlpassword,bot)
 
     @property
     def economysystem(self):
@@ -24,4 +24,4 @@ class SystemManager:
     
     @property
     def expsystem(self):
-        return self.expsystem
+        return self.exp
