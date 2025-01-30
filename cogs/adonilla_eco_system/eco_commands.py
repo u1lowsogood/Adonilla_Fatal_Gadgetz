@@ -4,7 +4,7 @@ import discord
 class ECOMMANDS(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.economysystem = self.bot.economysystem
+        self.economysystem = self.bot.system.economysystem
 
     @commands.group(invoke_without_command=True,aliases=["aeco"])
     async def adonnilaecosystem(self, ctx):
