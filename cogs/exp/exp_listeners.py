@@ -2,6 +2,7 @@ from discord.ext import commands
 from cogs.exp.expsystem import ExpSystem
 import discord 
 from datetime import datetime
+import re
 
 class EXPListeners(commands.Cog):
 
@@ -16,7 +17,17 @@ class EXPListeners(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self,msg : discord.Message):
+        if msg.content[0] == "/":
+            return
+        
+        lv_before = self.expsystem.get_status(msg.author.id)["level"]
         await self.expsystem.add_exp(msg.author, self.base_exp_table["message_send"])
+        lv_after = self.expsystem.get_status(msg.author.id)["level"]
+
+        if lv_before != lv_after:
+            lvup_emoji = ["🇱","🇻","🇺","🇵"]
+            for emoji in lvup_emoji:
+                await msg.add_reaction(emoji)
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
