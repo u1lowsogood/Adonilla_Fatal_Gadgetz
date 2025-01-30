@@ -17,9 +17,9 @@ class ExpSystem:
         self.sqlpassword = sqlpassword
         self.bot : commands.Bot = bot
 
-        self.exp_initial_max = 40
+        self.exp_initial_max = 30
         self.exp_max_multiplier = 1.3
-        self.exp_adder = 30
+        self.exp_adder = 10
 
     def _connect(self):
         return psycopg2.connect(user=self.sqluser, password=self.sqlpassword, host="localhost", port="5432", dbname="exp")
@@ -71,7 +71,7 @@ class ExpSystem:
         match = re.match(r"^(.*?)(?: 【Lv\. \d+】)?$", old_nick)
         base_name = match.group(1) 
         new_nick = f"{base_name} 【Lv. {level}】"
-        
+
         print(new_nick)
         try:
             await member.edit(nick=new_nick)
