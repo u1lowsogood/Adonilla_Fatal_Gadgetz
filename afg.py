@@ -1,13 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import asyncio
-from typing import Any, Coroutine, Optional
 import discord
-from discord.ext import tasks, commands
+from discord.ext import commands
+from system_manager import SystemManager
 import sys
-from cogs.adonilla_eco_system.economysystem import EconomySystem
-from cogs.shops.shops.shopsystem import ShopSystem
-from cogs.shops.premium_shop.premiumsystem import PremiumSystem
+
 
 args = sys.argv
 if len(args) != 4:
@@ -29,9 +26,7 @@ class afgBot(commands.Bot):
         self._sqluser = args[2]
         self._sqlpassword = args[3]
         self._adonilla_id = 364043473768284161
-        self._economysystem = EconomySystem(args[2], args[3])
-        self._shopsystem = ShopSystem(args[2], args[3], self.economysystem)
-        self._premiumsystem = PremiumSystem()
+        self._system_manager = SystemManager(self._sqluser, self._sqlpassword, self)
     
     @property
     def sqluser(self):
@@ -42,20 +37,12 @@ class afgBot(commands.Bot):
         return self._sqlpassword
     
     @property
-    def economysystem(self):
-        return self._economysystem
-    
-    @property
-    def shopsystem(self):
-        return self._shopsystem
-    
-    @property
-    def premiumsystem(self):
-        return self._premiumsystem
-    
-    @property
     def adonilla_id(self):
         return self._adonilla_id
+    
+    @property
+    def system(self):
+        return self._system_manager
     
 bot = afgBot()
 
@@ -99,13 +86,14 @@ cogz = [
     "cogs.convertfxtwitter.convertfxtwitter",
     "cogs.daily_bonus.daily_bonus",
     "cogs.kusodeka.kusodeka",
-
     "cogs.adonilla_eco_system.eco_commands",
     "cogs.shops.shops.shops",
     "cogs.shops.premium_shop.premium_shop",
     "cogs.shops.yoroduya_yuichi.yoroduya_yuichi",
     "cogs.shops.u1chinko.u1chinko",
     "cogs.shops.umaotoko.umaotoko_command",
+    "cogs.exp.exp_commands",
+    "cogs.exp.exp_listeners"
     #"cogs.depressed_battle.depressed_battle",
     ]
 
@@ -116,6 +104,6 @@ async def on_ready():
     for kog in cogz:
         await bot.load_extension(kog)
         print(f"{kog} was loaded!")
-    print(f"< all cogs were successfully loaded! >\n")
+    print("< all cogs were successfully loaded! >\n")
 
 bot.run(TOKEN)

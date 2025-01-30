@@ -12,7 +12,7 @@ import random
 class DAILY(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.economysystem = self.bot.economysystem
+        self.economysystem = self.bot.system.economysystem
         self.between_hour = 6
         self.base_multiply = 350
 

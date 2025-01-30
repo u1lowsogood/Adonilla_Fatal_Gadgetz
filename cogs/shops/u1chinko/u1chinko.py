@@ -10,8 +10,8 @@ class U1CHINKO(commands.Cog):
         self.shop_id = 3
         self.shop_name = "u1chinko"
         self.bot = bot
-        self.economysystem = self.bot.economysystem
-        self.shopsystem = self.bot.shopsystem
+        self.economysystem = self.bot.system.economysystem
+        self.shopsystem = self.bot.system.shopsystem
         self.user_status = {}
 
         self.ITEM_HANDLERS = [

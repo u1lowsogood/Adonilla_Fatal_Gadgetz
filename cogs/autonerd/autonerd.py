@@ -9,7 +9,7 @@ class AutoNerd(commands.Cog):
         self.bot = bot
         self.sended_amount = 0
         self.next_amount = 5
-        self.economysystem = self.bot.economysystem
+        self.economysystem = self.bot.system.economysystem
         self.reactions = [
             "🤓💦",
             "🤓",

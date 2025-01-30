@@ -9,8 +9,8 @@ class YORODUYA_U1(commands.Cog):
     def __init__(self, bot):
         self.shop_id = 1
         self.bot = bot
-        self.economysystem = self.bot.economysystem
-        self.shopsystem = self.bot.shopsystem
+        self.economysystem = self.bot.system.economysystem
+        self.shopsystem = self.bot.system.shopsystem
         self.user_status = {}
 
         self.ITEM_HANDLERS = [
