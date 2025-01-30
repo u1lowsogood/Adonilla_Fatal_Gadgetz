@@ -4,10 +4,9 @@ import asyncio
 from typing import Any, Coroutine, Optional
 import discord
 from discord.ext import tasks, commands
+from system_manager import SystemManager
 import sys
-from cogs.adonilla_eco_system.economysystem import EconomySystem
-from cogs.shops.shops.shopsystem import ShopSystem
-from cogs.shops.premium_shop.premiumsystem import PremiumSystem
+
 
 args = sys.argv
 if len(args) != 4:
@@ -29,9 +28,7 @@ class afgBot(commands.Bot):
         self._sqluser = args[2]
         self._sqlpassword = args[3]
         self._adonilla_id = 364043473768284161
-        self._economysystem = EconomySystem(args[2], args[3])
-        self._shopsystem = ShopSystem(args[2], args[3], self.economysystem)
-        self._premiumsystem = PremiumSystem()
+        self._system_manager = SystemManager(self._sqluser, self._sqlpassword)
     
     @property
     def sqluser(self):
@@ -40,18 +37,6 @@ class afgBot(commands.Bot):
     @property
     def sqlpassword(self):
         return self._sqlpassword
-    
-    @property
-    def economysystem(self):
-        return self._economysystem
-    
-    @property
-    def shopsystem(self):
-        return self._shopsystem
-    
-    @property
-    def premiumsystem(self):
-        return self._premiumsystem
     
     @property
     def adonilla_id(self):
