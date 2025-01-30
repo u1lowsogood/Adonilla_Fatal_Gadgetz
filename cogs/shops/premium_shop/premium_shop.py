@@ -7,9 +7,9 @@ class PREMIUM(commands.Cog):
     def __init__(self, bot):
         self.shop_id = 2
         self.bot = bot
-        self.economysystem = self.bot.economysystem
-        self.shopsystem = self.bot.shopsystem
-        self.premiumsystem = self.bot.premiumsystem
+        self.economysystem = self.bot.system.economysystem
+        self.shopsystem = self.bot.system.shopsystem
+        self.premiumsystem = self.bot.system.premiumsystem
 
         self.usage = dedent("""
             ```md

@@ -42,6 +42,10 @@ class afgBot(commands.Bot):
     def adonilla_id(self):
         return self._adonilla_id
     
+    @property
+    def system(self):
+        return self._system_manager
+    
 bot = afgBot()
 
 #上から読み込まれるからデバッグしたい新規機能は上から追加したほうがいいかも？

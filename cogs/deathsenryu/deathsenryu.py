@@ -72,7 +72,7 @@ class IkkuReadingModal(discord.ui.Modal,title="川柳を詠む"):
                 ("頑張ったで賞！",500),
             ]
             award = random.choices(table,weights=[1,2,1],k=1)[0]
-            self.bot.economysystem.deposit(str(interaction.user.id),award[1])
+            self.bot.system.economysystem.deposit(str(interaction.user.id),award[1])
             await self.replyto.reply(f"見事『{award[0]}』を勝ち取りました！\n{award[1]}ADP 獲得！")
 
     def sqlinsert(self,senryu):

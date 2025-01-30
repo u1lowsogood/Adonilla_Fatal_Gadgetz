@@ -12,8 +12,8 @@ class JRA(commands.Cog):
         self.shop_id = 4
         self.shop_name = "JRA（弱者男性レーシングアソシエーション）"
         self.bot = bot
-        self.economysystem = self.bot.economysystem
-        self.shopsystem = self.bot.shopsystem
+        self.economysystem = self.bot.system.economysystem
+        self.shopsystem = self.bot.system.shopsystem
         self.raceManager = None
 
         self.usage = dedent("""
