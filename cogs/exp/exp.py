@@ -7,13 +7,13 @@ class EXP(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.expsystem = self.bot.system.expsystem
 
     @commands.command()
     async def exptest(self,ctx,sex:str="セックス",amanda:str="アマンダ",hardfuck:str="ハードファック"):
         text = sex + "爆弾" + amanda + "は" + hardfuck
 
         img = cv2.imread("./cogs/amanda/amanda_base.png")
-        puttext.cv2_putText(img, text, (340, 380), "./cogs/amanda/NotoSansJP-Regular.ttf", 34, (255,255,255), anchor="mm")
 
         img_bytes = cv2.imencode('.png', img)[1].tobytes()
         bio = io.BytesIO(img_bytes)
@@ -22,4 +22,4 @@ class EXP(commands.Cog):
         await ctx.send(file=img_file)
 
 async def setup(bot):
-    await bot.add_cog(Amanda(bot))
+    await bot.add_cog(EXP(bot))

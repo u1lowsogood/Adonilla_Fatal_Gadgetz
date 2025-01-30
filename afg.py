@@ -88,13 +88,13 @@ cogz = [
     "cogs.convertfxtwitter.convertfxtwitter",
     "cogs.daily_bonus.daily_bonus",
     "cogs.kusodeka.kusodeka",
-
     "cogs.adonilla_eco_system.eco_commands",
     "cogs.shops.shops.shops",
     "cogs.shops.premium_shop.premium_shop",
     "cogs.shops.yoroduya_yuichi.yoroduya_yuichi",
     "cogs.shops.u1chinko.u1chinko",
     "cogs.shops.umaotoko.umaotoko_command",
+    "cogs.exp.exp"
     #"cogs.depressed_battle.depressed_battle",
     ]
 
@@ -105,6 +105,6 @@ async def on_ready():
     for kog in cogz:
         await bot.load_extension(kog)
         print(f"{kog} was loaded!")
-    print(f"< all cogs were successfully loaded! >\n")
+    print("< all cogs were successfully loaded! >\n")
 
 bot.run(TOKEN)
