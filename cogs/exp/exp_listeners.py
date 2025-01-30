@@ -17,7 +17,7 @@ class EXPListeners(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self,msg : discord.Message):
-        if msg.content[0] == "/":
+        if msg.content and msg.content.startswith("/"):
             return
         
         lv_before = self.expsystem.get_status(msg.author.id)["level"]

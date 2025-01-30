@@ -19,7 +19,7 @@ class ExpSystem:
 
         self.exp_initial_max = 30
         self.exp_max_multiplier = 1.3
-        self.exp_adder = 10
+        self.exp_adder = 15
 
     def _connect(self):
         return psycopg2.connect(user=self.sqluser, password=self.sqlpassword, host="localhost", port="5432", dbname="exp")
@@ -51,10 +51,10 @@ class ExpSystem:
 
                 exp += exp_amount
                 
-                while exp >= result['exp_max']:
+                while exp >= exp_max:
                     exp -= exp_max
                     level += 1
-                    exp_max += self.exp_adder
+                    exp_max = self.exp_initial_max+(self.exp_adder*level)
 
                 cur.execute(
                     "UPDATE exp SET exp_current=%s,exp_max=%s, level=%s WHERE user_uuid = %s",
@@ -64,9 +64,9 @@ class ExpSystem:
                 conn.commit()
 
                 if old_level != level:
-                    await self.on_member_level_up(member, level)
+                    await self.change_nick(member, level)
 
-    async def on_member_level_up(self, member : discord.Member, level: int):
+    async def change_nick(self, member : discord.Member, level: int):
         old_nick = member.nick or member.name
         match = re.match(r"^(.*?)(?: 【Lv\. \d+】)?$", old_nick)
         base_name = match.group(1) 
