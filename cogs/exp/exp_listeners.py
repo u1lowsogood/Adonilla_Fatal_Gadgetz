@@ -18,7 +18,7 @@ class EXPListeners(commands.Cog):
             "vc_per_second": 3 / 60
         }
         self.join_times = {}
-        self.special_words = {"チン", "マン","エロ","ンコ","狂","殺","悪"}
+        self.special_words = {"チン", "マン","エロ","ンコ","狂","殺","悪","オタク"}
 
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):
