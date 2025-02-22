@@ -27,14 +27,14 @@ class Tanjohbi(commands.Cog):
         sendmsg = dedent(f"""
         {msg.author.mention}
 
-        誕生日おめでとうございます！
+        お誕生日おめでとうございます！
         # 計算すると、あなたのお母様は **__{day_sex.strftime('%m月%d日')}__** に **__セックス__** をしましたね笑
 
         ```md
         # 【あなたのお母様の詳細なセックス情報】
-        ・セックス日時： {day_sex.strftime('%m月%d日 %H時%M分')} ({299+9+3}日前)
-        ・受精日時： {day_jusei.strftime('%m月%d日 %H時%M分')} ({299+9}日前)
-        ・着床日時： {day_chakushou.strftime('%m月%d日 %H時%M分')} ({299}日前)
+        ・セックス日時： {day_sex.strftime('%m月%d日 %H時%M分')} ({266+9+3}日前)
+        ・受精日時： {day_jusei.strftime('%m月%d日 %H時%M分')} ({266+9}日前)
+        ・着床日時： {day_chakushou.strftime('%m月%d日 %H時%M分')} ({266}日前)
         ```
         """
         )
