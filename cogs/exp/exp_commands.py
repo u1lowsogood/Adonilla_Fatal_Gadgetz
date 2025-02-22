@@ -12,7 +12,7 @@ class EXP_Commands(commands.Cog):
         self.bot = bot
         self.expsystem : ExpSystem = self.bot.system.expsystem
 
-    @commands.group(invoke_without_command=True,aliases=["lv"])
+    @commands.group(invoke_without_command=True,aliases=["lv","exp"])
     async def level(self, ctx):
         await self.expsystem.show_gauge(ctx)
 

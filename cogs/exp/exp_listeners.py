@@ -11,7 +11,7 @@ class EXPListeners(commands.Cog):
         self.expsystem: ExpSystem = self.bot.system.expsystem
         self.base_exp_table = {
             "message_send": 1,
-            "message_exp_per_char" : 1 / 20,
+            "message_exp_per_char" : 1 / 10,
             "message_has_picture": 6,
             "message_mentioned": 6,
             "message_word_bonus": 5,

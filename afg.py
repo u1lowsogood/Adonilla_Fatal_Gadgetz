@@ -93,7 +93,8 @@ cogz = [
     "cogs.shops.u1chinko.u1chinko",
     "cogs.shops.umaotoko.umaotoko_command",
     "cogs.exp.exp_commands",
-    "cogs.exp.exp_listeners"
+    "cogs.exp.exp_listeners",
+    "cogs.recaliculate_birthday.tanjohbi"
     #"cogs.depressed_battle.depressed_battle",
     ]
 
