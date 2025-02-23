@@ -94,7 +94,8 @@ cogz = [
     "cogs.shops.umaotoko.umaotoko_command",
     "cogs.exp.exp_commands",
     "cogs.exp.exp_listeners",
-    "cogs.recaliculate_birthday.tanjohbi"
+    "cogs.recaliculate_birthday.tanjohbi",
+    "cogs.metronome.metro"
     #"cogs.depressed_battle.depressed_battle",
     ]
 
