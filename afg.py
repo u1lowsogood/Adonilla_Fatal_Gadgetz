@@ -48,6 +48,7 @@ bot = afgBot()
 
 #上から読み込まれるからデバッグしたい新規機能は上から追加したほうがいいかも？
 cogz = [
+    "cogs.textcooler.textcooler",
     "cogs.translate.translate",
     "cogs.pinch.pinch",
     "cogs.reloader.reloader",
@@ -95,7 +96,7 @@ cogz = [
     "cogs.exp.exp_commands",
     "cogs.exp.exp_listeners",
     "cogs.recaliculate_birthday.tanjohbi",
-    "cogs.metronome.metro"
+    "cogs.metronome.metro",
     #"cogs.depressed_battle.depressed_battle",
     ]
 

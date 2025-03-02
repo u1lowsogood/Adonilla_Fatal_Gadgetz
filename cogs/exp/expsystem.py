@@ -6,11 +6,6 @@ from discord.ext import commands
 import discord
 import re
 
-
-import logging
-
-logging.basicConfig(level=logging.DEBUG)
-
 class ExpSystem:
     def __init__(self, sqluser, sqlpassword, bot):
         self.sqluser = sqluser
