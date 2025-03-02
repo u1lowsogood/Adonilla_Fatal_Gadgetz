@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+import random
 
 class METRONOME(commands.Cog):
 
@@ -11,6 +12,7 @@ class METRONOME(commands.Cog):
             "お風呂場" : "metronome_bathroom.mp3",
             "ディレイ" : "metronome_delayed.mp3",
             "定規弾き" : "metronome_plucked.mp3",
+            "逆再生" : "metronome_reversed.mp3",
             "音割れ" : "metronome_distorted.mp3",
             }
 
@@ -37,7 +39,10 @@ class METRONOME(commands.Cog):
 
         if voice_client.is_playing():
             voice_client.stop()
-    
+
+        if sound_index < 0:
+            sound_index = random.randint(1,len(self.sounds))
+
         sound_path =  self.path + list(self.sounds.values())[sound_index-1]
         source = discord.FFmpegPCMAudio(sound_path)
         voice_client.play(source)
