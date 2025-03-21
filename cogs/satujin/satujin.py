@@ -13,7 +13,7 @@ class Satujin(commands.Cog):
             if len(sendarg)+2 > 2000:
                 break
             sendarg += "殺人"
-
+        print(1/0)
         await ctx.send(sendarg)
 
 async def setup(bot):
