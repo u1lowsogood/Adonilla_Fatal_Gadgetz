@@ -65,6 +65,7 @@ def main():
         "cogs.exp.exp_listeners",
         "cogs.recaliculate_birthday.tanjohbi",
         "cogs.metronome.metro",
+        "cogs.auto_nikki.nikkikun",
         #"cogs.depressed_battle.depressed_battle",
         ]
 
