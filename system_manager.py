@@ -6,26 +6,26 @@ from cogs.exp.expsystem import ExpSystem
 class SystemManager:
     def __init__(self, sqluser, sqlpassword, bot):
         try:
-            self.economy = EconomySystem(sqluser, sqlpassword)
-            self.shop = ShopSystem(sqluser, sqlpassword, self.economy)
-            self.premium = PremiumSystem()
-            self.exp = ExpSystem(sqluser, sqlpassword,bot)
+            self._economy = EconomySystem(sqluser, sqlpassword)
+            self._shop = ShopSystem(sqluser, sqlpassword, self._economy)
+            self._premium = PremiumSystem()
+            self._exp = ExpSystem(sqluser, sqlpassword,bot)
         except Exception as e:
             print(f"[ERROR] SystemManager initialization failed: {e}")
             raise 
 
     @property
     def economysystem(self):
-        return self.economy
+        return self._economy
 
     @property
     def shopsystem(self):
-        return self.shop
+        return self._shop
 
     @property
     def premiumsystem(self):
-        return self.premium
+        return self._premium
     
     @property
     def expsystem(self):
-        return self.exp
+        return self._exp

@@ -2,9 +2,10 @@ from discord.ext import commands
 import psycopg2
 from psycopg2.extras import DictCursor
 from textwrap import dedent
+from afgBot import afgBot
 
 class PREMIUM(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot : afgBot):
         self.shop_id = 2
         self.bot = bot
         self.economysystem = self.bot.system.economysystem

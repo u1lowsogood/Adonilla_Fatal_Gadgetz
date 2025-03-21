@@ -1,12 +1,10 @@
 from discord.ext import commands
-import psycopg2
-from psycopg2.extras import DictCursor
 from textwrap import dedent
-
+from afgBot import afgBot
 from cogs.shops.u1chinko.funcs import item_1, item_2, item_3, item_4
 
 class U1CHINKO(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot : afgBot):
         self.shop_id = 3
         self.shop_name = "u1chinko"
         self.bot = bot

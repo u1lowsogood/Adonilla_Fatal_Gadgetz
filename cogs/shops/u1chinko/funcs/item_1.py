@@ -3,8 +3,9 @@ import random
 import asyncio
 import inspect
 import cogs.shops.u1chinko.funcs.combo as combo
+from afgBot import afgBot
 
-async def use_item(bot, ctx, ticket_multiplier = 1):
+async def use_item(bot : afgBot, ctx, ticket_multiplier = 1):
 
     die_emoji = ":game_die:"
     
@@ -30,8 +31,8 @@ async def use_item(bot, ctx, ticket_multiplier = 1):
     diff = abs(target - dice)
 
     player_uuid = str(ctx.author.id)
-    kokko_uuid = bot.economysystem.get_kokko_uuid()
-    kokko_balance = bot.economysystem.get_balance(kokko_uuid)
+    kokko_uuid = bot.system.economysystem.get_kokko_uuid()
+    kokko_balance = bot.system.economysystem.get_balance(kokko_uuid)
 
     conditions = [
         (0, lambda: kokko_balance, "__！！！！！！チャレンジ成功全財産略奪！！！！！！__"),
@@ -49,7 +50,7 @@ async def use_item(bot, ctx, ticket_multiplier = 1):
 
     amount *= ticket_multiplier
 
-    kokko_uuid = bot.economysystem.get_kokko_uuid()
+    kokko_uuid = bot.system.economysystem.get_kokko_uuid()
 
     # ベース分送金
     gatya_transfer(kokko_uuid, player_uuid, bot, amount)
@@ -63,7 +64,7 @@ async def use_item(bot, ctx, ticket_multiplier = 1):
         premium_multiplier = get_premium_multiplier(bot, ctx.author)
         final_amount = int(amount * premium_multiplier)
         sabun = final_amount - amount
-        bot.economysystem.deposit(player_uuid, sabun)
+        bot.system.economysystem.deposit(player_uuid, sabun)
 
         earn_msg = f"{final_amount}({origin_amount}{ticket_multiplier_msg}) ADP獲得！"
         premium_msg = f"`チケット倍率 x{ticket_multiplier:.2f} プレミアム倍率 x{premium_multiplier:.2f}=1+(Lv合計/15)*0.5 プレミアム増分 +{sabun}ADP`"
@@ -115,20 +116,20 @@ async def infinite_combo_bonus(ctx):
     result = await cb.combo_bonus(ctx)
     return result
 
-def get_premium_multiplier(bot,player):
+def get_premium_multiplier(bot : afgBot,player):
     max_lv = 15
-    lv_sum = bot.premiumsystem.get_level_sum(player)
+    lv_sum = bot.system.premiumsystem.get_level_sum(player)
     return 1.0 + (lv_sum / max_lv) * 0.5
 
-def gatya_transfer(kokko_uuid, player_uuid, bot, amount):
+def gatya_transfer(kokko_uuid, player_uuid, bot : afgBot, amount):
     if amount < 0:
-        if bot.economysystem.get_balance(player_uuid) < -amount:
-            amount = bot.economysystem.get_balance(player_uuid)
-        bot.economysystem.withdraw(player_uuid, -amount)
-        bot.economysystem.deposit(kokko_uuid, -amount)
+        if bot.system.economysystem.get_balance(player_uuid) < -amount:
+            amount = bot.system.economysystem.get_balance(player_uuid)
+        bot.system.economysystem.withdraw(player_uuid, -amount)
+        bot.system.economysystem.deposit(kokko_uuid, -amount)
     else:
         hikidasikin = amount
-        if bot.economysystem.get_balance(kokko_uuid) < amount:
-            hikidasikin = bot.economysystem.get_balance(kokko_uuid)
-        bot.economysystem.withdraw(kokko_uuid, hikidasikin)
-        bot.economysystem.deposit(player_uuid, amount)
+        if bot.system.economysystem.get_balance(kokko_uuid) < amount:
+            hikidasikin = bot.system.economysystem.get_balance(kokko_uuid)
+        bot.system.economysystem.withdraw(kokko_uuid, hikidasikin)
+        bot.system.economysystem.deposit(player_uuid, amount)
