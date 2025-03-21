@@ -18,6 +18,13 @@ class DAILY(commands.Cog):
 
     def _connect(self):
         return psycopg2.connect(user=self.bot.sqluser, password=self.bot.sqlpassword, host="localhost", port="5432", dbname="adonilla_economy_system")
+
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx : commands.Context, err):
+        if isinstance(err, commands.CommandOnCooldown):
+            return await ctx.send("コマンド入力早すぎるｗ（2秒に１回制限）")
+        else:
+            raise err
     
     @commands.group(invoke_without_command=True)
     @commands.cooldown(1, 2, type=discord.ext.commands.BucketType.user)
