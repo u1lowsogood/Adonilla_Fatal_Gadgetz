@@ -4,6 +4,7 @@ from enum import Enum
 import os
 import asyncio
 import discord
+from afgBot import afgBot
 from textwrap import dedent
 
 class Author(Enum):
@@ -16,11 +17,12 @@ class QUOTETYPE(Enum):
     WIN = "/win"
 
 class Player:
-    def __init__(self, author, max_damage = 30):
+    def __init__(self, author, min_damage = 1,max_damage = 30):
         self.root = "./cogs/sorakun_chatfight/quotes"
         self.author: Author = author
         self.max_health = 100
         self.health = self.max_health
+        self.min_damage = min_damage
         self.max_damage = max_damage
         self.charging_damage = []
         self.show_health_gauge = True
@@ -34,7 +36,7 @@ class Player:
             await ctx.send(file=discord.File(taunt))
 
     def charge_damage(self):
-        damage = random.randint(1, self.max_damage)
+        damage = random.randint(self.min_damage, self.max_damage)
         self.charging_damage.append(damage)
 
     async def attack(self, ctx: commands.Context, opponent: "Player"):
@@ -64,7 +66,7 @@ class Player:
     
 class PlayerManager():
     def __init__(self):
-        self.players = {"sora":Player(Author.SORA,10), "haruto":Player(Author.HARUTO)}
+        self.players = {"sora":Player(Author.SORA,1,25), "haruto":Player(Author.HARUTO,5,40)}
         self.current_attacker : Player = random.choice(list(self.players.values()))
         self.next_attacker : Player = self.current_attacker
 
@@ -80,19 +82,36 @@ class PlayerManager():
 
 class SORAFIGHT(commands.Cog):
 
-    def __init__(self, bot):
+    def __init__(self, bot : afgBot):
         self.bot = bot
-        self.isplaying = False
+        self.economy_system = bot.system.economysystem
+        self.user_playing = {}
 
     @commands.command(aliases=["そらくんチャットファイト"])
-    async def sorakun(self, ctx: commands.Context, amount : int = 100):
-        if self.isplaying:
+    async def sorakun(self, ctx: commands.Context, stake_amount : int = None):
+
+        if stake_amount == None:
+            await ctx.send("賭け金を指定してください。３倍になります。（500ADP ～）例：`/sorakun 500`")
             return
-        self.isplaying = True
+        
+        if stake_amount < 500:
+            await ctx.send("賭け金が不足しています！（500ADP ～）")
+            return
+
+        balance = self.economy_system.get_balance(str(ctx.author.id))
+        if balance < stake_amount:
+            await ctx.send(f"残高が不足しています！：{balance - stake_amount} ADP")
+            return
+        
+        if self.user_playing.get(ctx.author.id, False):
+            return
+        self.user_playing[ctx.author.id] = True
 
         playerManager = PlayerManager()
 
         await ctx.send("たいへーん！そらくんとはるとくんが喧嘩を始めちゃった……！")
+
+        await ctx.send(f"貴方の賭け金：{stake_amount} ADP。そらくん勝利時に** 3倍 **になります。 ** 負けたら全額没収。 **")
 
         await playerManager.players["sora"].taunt(ctx)
         await playerManager.players["haruto"].taunt(ctx)
@@ -119,11 +138,16 @@ class SORAFIGHT(commands.Cog):
             playerManager.current_attacker.charge_damage()
             await playerManager.current_attacker.taunt(ctx)
         
-        await self.endroll(ctx, playerManager.current_attacker, playerManager.get_opponent())
+        await self.endroll(ctx, playerManager)
+        await self.process_payment(ctx, playerManager, stake_amount)
         
-        self.isplaying = False
+        self.user_playing[ctx.author.id] = False
 
-    async def endroll(self, ctx : commands.Context, winner:Player, loser:Player):
+    async def endroll(self, ctx : commands.Context, playerManager: PlayerManager):
+
+        winner = playerManager.current_attacker
+        loser = playerManager.get_opponent()
+
         await asyncio.sleep(2)
         await ctx.send("おっと……？")
         await asyncio.sleep(2)
@@ -136,6 +160,21 @@ class SORAFIGHT(commands.Cog):
         lose_quote_path = loser.get_random_quote(QUOTETYPE.LOSE)
         await ctx.send(content=loser.health_gauge(),file=discord.File(lose_quote_path))
         await ctx.send(f"あらあら…… {loser.author.value['name']}くん、泣いちゃった！")
+
+    async def process_payment(self, ctx:commands.Context, playerManager: PlayerManager, stake_amount):
+
+        winner = playerManager.current_attacker
+        paymentmsg = ""
+
+        if winner == playerManager.players["sora"]:
+            self.bot.system.economysystem.transfer_from_kokko(str(ctx.author.id), stake_amount*2)
+            paymentmsg = f"# {ctx.author.mention}、 {stake_amount*3} ADPを獲得！"
+        else:
+            self.bot.system.economysystem.transfer_from_kokko(str(ctx.author.id), -stake_amount)
+            paymentmsg = f"# {ctx.author.mention}、 {stake_amount} ADPを失う……！"
+
+        await ctx.send(paymentmsg)
+
 
 async def setup(bot):
     await bot.add_cog(SORAFIGHT(bot))

@@ -74,3 +74,15 @@ class EconomySystem:
             with conn.cursor() as cur:
                 cur.execute("SELECT user_uuid, balance FROM accounts ORDER BY balance DESC LIMIT 1")
                 return cur.fetchone()[0]
+            
+    def transfer_from_kokko(self, player_uuid, amount):
+        kokko = self.get_kokko_uuid()
+        if amount < 0:
+            amount = min(self.get_balance(player_uuid), -amount)
+            self.withdraw(player_uuid, amount)
+            self.deposit(kokko, amount)
+            return
+        
+        amount = min(self.get_balance(), amount)
+        self.withdraw(kokko, amount)
+        self.deposit(player_uuid, amount)
