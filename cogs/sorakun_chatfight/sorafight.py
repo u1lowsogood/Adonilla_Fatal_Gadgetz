@@ -23,11 +23,13 @@ class Player:
         self.health = self.max_health
         self.max_damage = max_damage
         self.charging_damage = []
+        self.show_health_gauge = True
 
-    async def taunt(self, ctx: commands.Context, withgauge = False):
+    async def taunt(self, ctx: commands.Context):
         taunt = self.get_random_quote(QUOTETYPE.TAUNT)
-        if withgauge:
+        if self.show_health_gauge:
             await ctx.send(content=self.health_gauge(), file=discord.File(taunt))
+            self.show_health_gauge = False
         else:
             await ctx.send(file=discord.File(taunt))
 
@@ -37,6 +39,11 @@ class Player:
 
     async def attack(self, ctx: commands.Context, opponent: "Player"):
         total_damage = sum(self.charging_damage)
+
+        if total_damage <= 0:
+            return
+    
+        await asyncio.sleep(1)
         opponent.health -= total_damage
         await ctx.send(f"{opponent.author.value['name']}くんに **{total_damage} ダメージ！** `(={ '+'.join(map(str, self.charging_damage)) })`")
         self.charging_damage.clear()
@@ -54,6 +61,22 @@ class Player:
         files = os.listdir(dir_path)
         random_quote = os.path.join(dir_path, random.choice(files))
         return random_quote
+    
+class PlayerManager():
+    def __init__(self):
+        self.players = {"sora":Player(Author.SORA,10), "haruto":Player(Author.HARUTO)}
+        self.current_attacker : Player = random.choice(self.players.values())
+        self.next_attacker : Player = self.current_attacker
+
+    def get_opponent(self):
+        return self.players["haruto"] if self.current_attacker == self.players["sora"] else self.players["sora"]
+    
+    def set_next_attacker_randomly(self):
+        self.next_attacker = random.choice(self.players.values())
+
+    def flip_attacker(self):
+        self.current_attacker = self.next_attacker
+        self.current_attacker.show_health_gauge = True
 
 class SORAFIGHT(commands.Cog):
 
@@ -67,47 +90,36 @@ class SORAFIGHT(commands.Cog):
             return
         self.isplaying = True
 
-        sora = Player(Author.SORA,10)
-        haruto = Player(Author.HARUTO)
+        playerManager = PlayerManager()
 
         await ctx.send("たいへーん！そらくんとはるとくんが喧嘩を始めちゃった……！")
 
-        await sora.taunt(ctx,True)
-        await haruto.taunt(ctx,True)
+        await playerManager.players["sora"].taunt(ctx,True)
+        await playerManager.players["haruto"].taunt(ctx,True)
 
         await asyncio.sleep(2)
         await ctx.send("どちらが勝つか、見守ってあげよう！")
         await asyncio.sleep(1)
 
-        current_attacker = random.choice([sora, haruto])
-        opponent = haruto if current_attacker == sora else sora
-
         while True:
-            tauntflag = False
-            next_attacker = random.choice([sora, haruto])
+            playerManager.set_next_attacker_randomly()
             
-            if next_attacker != current_attacker:
-                total_damage = sum(current_attacker.charging_damage)
-                if total_damage > 0:
-                    await asyncio.sleep(1)
-                    current_attacker.attack(ctx, opponent)
+            if playerManager.next_attacker != playerManager.current_attacker:
+                playerManager.current_attacker.attack(ctx, playerManager.get_opponent())
 
-                    if opponent.health <= 0:
-                        break
+                if playerManager.get_opponent().health <= 0:
+                    break
                 
-                current_attacker = next_attacker
-                opponent = haruto if current_attacker == sora else sora
-                tauntflag = True
+                playerManager.flip_attacker()
 
             await asyncio.sleep(random.randint(0, 1))
             async with ctx.typing():
                 await asyncio.sleep(random.randint(1, 3))
             
-            current_attacker.charge_damage()
-            await current_attacker.taunt(ctx,tauntflag)
-            tauntflag = False
+            playerManager.current_attacker.charge_damage()
+            await playerManager.current_attacker.taunt(ctx)
         
-        await self.endroll(ctx, current_attacker, opponent)
+        await self.endroll(ctx, playerManager.current_attacker, playerManager.get_opponent())
         
         self.isplaying = False
 
