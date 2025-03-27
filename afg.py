@@ -65,6 +65,7 @@ def main():
         "cogs.exp.exp_listeners",
         "cogs.recaliculate_birthday.tanjohbi",
         "cogs.metronome.metro",
+        "cogs.sorakun_chatfight.sorafight"
         #"cogs.depressed_battle.depressed_battle",
         ]
 
