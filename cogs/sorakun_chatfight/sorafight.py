@@ -65,14 +65,14 @@ class Player:
 class PlayerManager():
     def __init__(self):
         self.players = {"sora":Player(Author.SORA,10), "haruto":Player(Author.HARUTO)}
-        self.current_attacker : Player = random.choice(self.players.values())
+        self.current_attacker : Player = random.choice(list(self.players.values()))
         self.next_attacker : Player = self.current_attacker
 
     def get_opponent(self):
         return self.players["haruto"] if self.current_attacker == self.players["sora"] else self.players["sora"]
     
     def set_next_attacker_randomly(self):
-        self.next_attacker = random.choice(self.players.values())
+        self.next_attacker = random.choice(list(self.players.values()))
 
     def flip_attacker(self):
         self.current_attacker = self.next_attacker
@@ -94,8 +94,8 @@ class SORAFIGHT(commands.Cog):
 
         await ctx.send("たいへーん！そらくんとはるとくんが喧嘩を始めちゃった……！")
 
-        await playerManager.players["sora"].taunt(ctx,True)
-        await playerManager.players["haruto"].taunt(ctx,True)
+        await playerManager.players["sora"].taunt(ctx)
+        await playerManager.players["haruto"].taunt(ctx)
 
         await asyncio.sleep(2)
         await ctx.send("どちらが勝つか、見守ってあげよう！")
@@ -105,7 +105,7 @@ class SORAFIGHT(commands.Cog):
             playerManager.set_next_attacker_randomly()
             
             if playerManager.next_attacker != playerManager.current_attacker:
-                playerManager.current_attacker.attack(ctx, playerManager.get_opponent())
+                await playerManager.current_attacker.attack(ctx, playerManager.get_opponent())
 
                 if playerManager.get_opponent().health <= 0:
                     break
