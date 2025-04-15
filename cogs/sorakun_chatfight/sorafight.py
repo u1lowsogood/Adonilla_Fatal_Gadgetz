@@ -1,84 +1,11 @@
 from discord.ext import commands
 import random
-from enum import Enum
-import os
 import asyncio
 import discord
 from afgBot import afgBot
 from textwrap import dedent
-
-class Author(Enum):
-    SORA = {"dir": "/sorara", "name": "そら"}
-    HARUTO = {"dir": "/haruton", "name": "はると"}
-    
-class QUOTETYPE(Enum):
-    TAUNT = "/taunt"
-    LOSE = "/lose"
-    WIN = "/win"
-
-class Player:
-    def __init__(self, author, min_damage = 1,max_damage = 30):
-        self.root = "./cogs/sorakun_chatfight/quotes"
-        self.author: Author = author
-        self.max_health = 100
-        self.health = self.max_health
-        self.min_damage = min_damage
-        self.max_damage = max_damage
-        self.charging_damage = []
-        self.show_health_gauge = True
-
-    async def taunt(self, ctx: commands.Context):
-        taunt = self.get_random_quote(QUOTETYPE.TAUNT)
-        if self.show_health_gauge:
-            await ctx.send(content=self.health_gauge(), file=discord.File(taunt))
-            self.show_health_gauge = False
-        else:
-            await ctx.send(file=discord.File(taunt))
-
-    def charge_damage(self):
-        damage = random.randint(self.min_damage, self.max_damage)
-        self.charging_damage.append(damage)
-
-    async def attack(self, ctx: commands.Context, opponent: "Player"):
-        total_damage = sum(self.charging_damage)
-
-        if total_damage <= 0:
-            return
-    
-        await asyncio.sleep(1)
-        opponent.health -= total_damage
-        await ctx.send(f"{opponent.author.value['name']}くんに **{total_damage} ダメージ！** `(={ '+'.join(map(str, self.charging_damage)) })`")
-        self.charging_damage.clear()
-
-    def health_gauge(self):
-        filled_count = round((self.health / self.max_health) * 10)
-        filled = "■" * filled_count 
-        empty = "-" * (10 - filled_count)
-        return dedent(f"""```md
-|{filled}{empty}|({0 if self.health < 0 else self.health}/{self.max_health})
-```""")
-
-    def get_random_quote(self, quote_type: QUOTETYPE):
-        dir_path = self.root + self.author.value["dir"] + quote_type.value
-        files = os.listdir(dir_path)
-        random_quote = os.path.join(dir_path, random.choice(files))
-        return random_quote
-    
-class PlayerManager():
-    def __init__(self):
-        self.players = {"sora":Player(Author.SORA,1,25), "haruto":Player(Author.HARUTO,5,40)}
-        self.current_attacker : Player = random.choice(list(self.players.values()))
-        self.next_attacker : Player = self.current_attacker
-
-    def get_opponent(self):
-        return self.players["haruto"] if self.current_attacker == self.players["sora"] else self.players["sora"]
-    
-    def set_next_attacker_randomly(self):
-        self.next_attacker = random.choice(list(self.players.values()))
-
-    def flip_attacker(self):
-        self.current_attacker = self.next_attacker
-        self.current_attacker.show_health_gauge = True
+from cogs.sorakun_chatfight.playermanager import PlayerManager
+from cogs.sorakun_chatfight.quotetype import QUOTETYPE
 
 class SORAFIGHT(commands.Cog):
 

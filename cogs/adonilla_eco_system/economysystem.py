@@ -83,6 +83,6 @@ class EconomySystem:
             self.deposit(kokko, amount)
             return
         
-        amount = min(self.get_balance(), amount)
+        amount = min(self.get_balance(player_uuid), amount)
         self.withdraw(kokko, amount)
         self.deposit(player_uuid, amount)
