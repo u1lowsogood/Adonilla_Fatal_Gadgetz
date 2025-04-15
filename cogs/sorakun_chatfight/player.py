@@ -3,6 +3,7 @@ import discord
 import asyncio
 import random
 import os
+from textwrap import dedent
 
 from cogs.sorakun_chatfight.author import Author
 from cogs.sorakun_chatfight.quotetype import QUOTETYPE
